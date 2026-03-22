@@ -16,11 +16,8 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script type="module">
-  import { initializeApp }
-    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getDatabase, ref, set, get, onValue, remove }
-    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getDatabase, ref, set, get, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
   const firebaseConfig = {
     apiKey:            "AIzaSyDPMQH8FzkjZMPTFR09cuMGYi5k9NmuIwQ",
     authDomain:        "ping-me-1c3d9.firebaseapp.com",
@@ -30,17 +27,13 @@
     messagingSenderId: "398925457761",
     appId:             "1:398925457761:web:5a776122569db9339dbd20"
   };
-
   try {
     const app = initializeApp(firebaseConfig);
     const db  = getDatabase(app);
     window._FB = { db, ref, set, get, onValue, remove };
     window._firebaseReady = true;
     document.dispatchEvent(new Event("firebase-ready"));
-    console.log("Firebase connected — Asia Southeast 1");
-  } catch(e) {
-    console.error("Firebase init error:", e);
-  }
+  } catch(e) { console.error("Firebase init error:", e); }
 </script>
 
 <style>
@@ -56,20 +49,24 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--tx);font-famil
 body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
   background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,229,255,.013) 2px,rgba(0,229,255,.013) 4px),
   linear-gradient(135deg,rgba(139,92,246,.06) 0%,transparent 50%,rgba(0,229,255,.04) 100%)}
+/* screens */
 .screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;opacity:0;pointer-events:none;transition:opacity .3s;z-index:1;overflow-y:auto;overflow-x:hidden}
 .screen.active{opacity:1;pointer-events:all}
 .si{display:flex;flex-direction:column;align-items:center;gap:13px;width:100%;max-width:420px;padding:44px 18px 110px;min-height:100%}
+/* brand */
 .brand{display:flex;align-items:center;gap:13px;animation:slideDown .5s ease both;width:100%}
-.bi{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--cy),var(--pu));display:grid;place-items:center;font-size:22px;flex-shrink:0;box-shadow:0 0 26px rgba(0,229,255,.22),0 0 52px rgba(139,92,246,.1)}
+.bi{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--cy),var(--pu));display:grid;place-items:center;font-size:22px;flex-shrink:0;box-shadow:0 0 26px rgba(0,229,255,.22)}
 .bi.red{background:linear-gradient(135deg,var(--rd),#991b1b)}
 .bn{font-size:25px;font-weight:800;letter-spacing:-1px;line-height:1;background:linear-gradient(90deg,var(--cy),var(--pu));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .bn.red{background:linear-gradient(90deg,var(--rd),var(--or));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .bt{font-family:var(--mo);font-size:10px;color:var(--mt);letter-spacing:2px;text-transform:uppercase;margin-top:1px}
+/* cards */
 .card{width:100%;background:var(--s1);border:1px solid var(--b1);border-radius:15px;overflow:hidden;animation:fadeUp .4s ease both}
 .ch{padding:12px 16px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between}
 .cl{font-family:var(--mo);font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--mt)}
 .cb{padding:15px}
-.btn{width:100%;padding:14px 17px;border:none;border-radius:11px;font-family:var(--hd);font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;letter-spacing:.3px;display:flex;align-items:center;justify-content:center;gap:7px}
+/* buttons */
+.btn{width:100%;padding:14px 17px;border:none;border-radius:11px;font-family:var(--hd);font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;position:relative;letter-spacing:.3px;display:flex;align-items:center;justify-content:center;gap:7px}
 .btn:active{transform:scale(.97)}
 .btn:disabled{opacity:.55;cursor:not-allowed;transform:none!important}
 .bc{background:linear-gradient(135deg,var(--cy),#0099bb);color:#000;box-shadow:0 4px 20px rgba(0,229,255,.22)}
@@ -80,24 +77,30 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 .bgh{background:var(--s2);color:var(--tx);border:1px solid var(--b1)}
 .bsm{padding:9px 14px;font-size:12px;border-radius:9px}
 .brow{display:flex;gap:7px;width:100%}.brow .btn{flex:1}
+/* inputs */
 input[type=text]{width:100%;padding:12px 14px;background:var(--s2);border:1px solid var(--b1);border-radius:9px;color:var(--tx);font-family:var(--mo);font-size:18px;text-align:center;letter-spacing:5px;text-transform:uppercase;transition:border-color .2s;outline:none}
 input[type=text]:focus{border-color:var(--cy)}
 input.ni{font-size:14px;letter-spacing:1px;text-align:left;text-transform:none}
 input::placeholder{color:var(--mt);font-size:12px;letter-spacing:2px}
 input.ni::placeholder{letter-spacing:.5px}
+/* pills */
 .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;font-family:var(--mo);font-size:11px;background:var(--s2);border:1px solid var(--b1)}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--mt);flex-shrink:0}
 .dot.live{background:var(--gn);box-shadow:0 0 6px var(--gn);animation:blink 2s infinite}
 .dot.share{background:var(--cy);box-shadow:0 0 6px var(--cy);animation:blink 2s infinite}
 .dot.sos{background:var(--rd);box-shadow:0 0 8px var(--rd);animation:blink .7s infinite}
+/* room code */
 .code-big{font-family:var(--mo);font-size:36px;font-weight:500;letter-spacing:11px;text-align:center;padding:5px 0;background:linear-gradient(90deg,var(--cy),var(--pu));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .code-hint{font-family:var(--mo);font-size:11px;color:var(--mt);text-align:center;line-height:1.8}
+/* coords */
 .cbox{display:flex;gap:5px;align-items:center;font-family:var(--mo);font-size:11px;color:var(--cy);background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.15);padding:7px 11px;border-radius:8px;flex-wrap:wrap}
 .cbox span{color:var(--mt)}
+/* alerts */
 .alert{width:100%;padding:12px 14px;border-radius:11px;font-size:12px;font-family:var(--mo);line-height:1.7;display:flex;gap:8px;align-items:flex-start}
 .a-warn{background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.3);color:var(--or)}
 .a-red{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);color:var(--rd)}
 .ai{font-size:14px;flex-shrink:0;margin-top:1px}
+/* user list */
 .ulist{display:flex;flex-direction:column}
 .uitem{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--b1)}
 .uitem:last-child{border-bottom:none}
@@ -112,17 +115,20 @@ input.ni::placeholder{letter-spacing:.5px}
 .ua{display:flex;gap:4px}
 .ib{width:28px;height:28px;border-radius:6px;display:grid;place-items:center;font-size:13px;cursor:pointer;transition:all .15s;border:none;background:var(--s3)}
 .ib:active{transform:scale(.92)}
+/* misc */
 .stitle{font-family:var(--mo);font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--mt);width:100%;padding:0 2px}
 .divider{display:flex;align-items:center;gap:10px;color:var(--mt);font-size:11px;font-family:var(--mo);width:100%;letter-spacing:1px}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--b1)}
 .nrow{display:flex;align-items:center;gap:9px}
 .nprev{width:34px;height:34px;border-radius:50%;background:rgba(0,229,255,.12);border:1.5px solid var(--cy);display:grid;place-items:center;font-size:17px;flex-shrink:0}
+/* SOS button */
 .sos-wrap{position:relative;display:flex;align-items:center;justify-content:center;padding:54px 0;overflow:hidden;border-radius:10px}
 .sos-ring{position:absolute;width:94px;height:94px;border-radius:50%;border:2px solid rgba(239,68,68,.3);animation:sosRing 2s ease-out infinite;pointer-events:none}
 .sos-ring:nth-child(2){animation-delay:.7s}.sos-ring:nth-child(3){animation-delay:1.4s}
-.sos-btn{position:relative;z-index:1;width:94px;height:94px;border-radius:50%;background:radial-gradient(circle,#e53e3e,#991b1b);border:none;color:#fff;font-family:var(--hd);font-weight:800;font-size:11px;letter-spacing:.5px;cursor:pointer;box-shadow:0 0 26px rgba(239,68,68,.5),0 0 52px rgba(239,68,68,.2);transition:all .15s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;outline:none}
+.sos-btn{position:relative;z-index:1;width:94px;height:94px;border-radius:50%;background:radial-gradient(circle,#e53e3e,#991b1b);border:none;color:#fff;font-family:var(--hd);font-weight:800;font-size:11px;cursor:pointer;box-shadow:0 0 26px rgba(239,68,68,.5);transition:all .15s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;outline:none}
 .sos-btn:active{transform:scale(.94)}
 .sos-btn.active-sos{animation:sosG 1s infinite alternate}
+/* map */
 #map-screen{padding:0;justify-content:flex-start;align-items:stretch;overflow:hidden}
 #map{position:absolute;inset:0;z-index:1}
 .map-top{position:absolute;top:0;left:0;right:0;z-index:900;padding:11px 13px;background:linear-gradient(to bottom,rgba(6,10,20,.95) 55%,transparent);display:flex;align-items:center;gap:8px}
@@ -134,6 +140,7 @@ input.ni::placeholder{letter-spacing:.5px}
 .li{display:flex;align-items:center;gap:5px;font-family:var(--mo);font-size:11px;color:var(--mt)}
 .ld{width:9px;height:9px;border-radius:50%}
 .mbr{display:flex;gap:7px}.mbr .btn{flex:1}
+/* slide panel */
 .pov{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .3s}
 .pov.open{opacity:1;pointer-events:all}
 .panel{position:fixed;bottom:0;left:0;right:0;z-index:850;background:var(--s1);border:1px solid var(--b1);border-bottom:none;border-radius:20px 20px 0 0;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,1,.5,1);max-height:85vh;overflow-y:auto}
@@ -141,59 +148,59 @@ input.ni::placeholder{letter-spacing:.5px}
 .ph{width:36px;height:4px;border-radius:2px;background:var(--b2);margin:13px auto 0}
 .pt{font-size:16px;font-weight:700;padding:12px 20px 0}
 .pb{padding:14px 20px 36px;display:flex;flex-direction:column;gap:12px}
+/* toast */
 #toast{position:fixed;bottom:100px;left:50%;z-index:9999;transform:translateX(-50%) translateY(14px);background:var(--s1);border:1px solid var(--b2);color:var(--tx);padding:10px 17px;border-radius:10px;font-size:12px;font-family:var(--mo);opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* leaflet */
 .leaflet-container{background:#060a14!important}
 .leaflet-tile{filter:brightness(.58) saturate(.5) hue-rotate(195deg) contrast(1.1)}
 .leaflet-control-zoom a{background:var(--s1)!important;color:var(--tx)!important;border-color:var(--b1)!important;border-radius:8px!important}
 .leaflet-control-zoom{border:1px solid var(--b1)!important;border-radius:10px!important;overflow:hidden}
-.leaflet-popup-content-wrapper{background:var(--s1)!important;color:var(--tx)!important;border:1px solid var(--b1)!important;border-radius:10px!important;box-shadow:0 8px 30px rgba(0,0,0,.5)!important;font-family:var(--mo)!important;font-size:11px!important}
+.leaflet-popup-content-wrapper{background:var(--s1)!important;color:var(--tx)!important;border:1px solid var(--b1)!important;border-radius:10px!important;font-family:var(--mo)!important;font-size:11px!important}
 .leaflet-popup-tip{background:var(--s1)!important}
 .pm{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;border:2.5px solid}
 .pm-me{background:rgba(0,229,255,.15);border-color:var(--cy);box-shadow:0 0 14px rgba(0,229,255,.4)}
 .pm-ot{background:rgba(139,92,246,.15);border-color:var(--pu);box-shadow:0 0 14px rgba(139,92,246,.4)}
 .pm-sos{background:rgba(239,68,68,.2);border-color:var(--rd);box-shadow:0 0 18px rgba(239,68,68,.6);animation:sosG 1s infinite alternate}
-/* ── SILENT TRACKER SCREEN ── */
+/* silent tracker screen */
 #tracker-screen{background:var(--bg)}
-.trk-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:24px;padding:40px 24px;text-align:center;position:relative;z-index:2}
-.trk-pulse-ring{position:absolute;width:180px;height:180px;border-radius:50%;border:2px solid rgba(0,229,255,.15);animation:trkRing 3s ease-out infinite;pointer-events:none}
-.trk-pulse-ring:nth-child(2){animation-delay:1s}.trk-pulse-ring:nth-child(3){animation-delay:2s}
-@keyframes trkRing{0%{transform:scale(.6);opacity:.8}100%{transform:scale(2.4);opacity:0}}
-.trk-center{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:16px}
-.trk-icon{width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(0,229,255,.2),rgba(0,229,255,.05));border:2px solid var(--cy);display:grid;place-items:center;font-size:38px;box-shadow:0 0 40px rgba(0,229,255,.3)}
-.trk-status{font-size:22px;font-weight:800;letter-spacing:-.5px}
-.trk-sub{font-family:var(--mo);font-size:11px;color:var(--mt);line-height:1.8}
-.trk-coords{font-family:var(--mo);font-size:13px;color:var(--cy);background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.15);padding:8px 16px;border-radius:10px;min-width:220px;text-align:center;line-height:2}
-.trk-meta{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
-.trk-chip{font-family:var(--mo);font-size:11px;background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:6px 12px;color:var(--mt)}
-.trk-chip b{color:var(--tx);display:block;font-size:13px}
-.trk-freq{font-family:var(--mo);font-size:12px;color:var(--cy);text-align:center}
-.wake-warn{background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.25);border-radius:12px;padding:12px 14px;font-family:var(--mo);font-size:11px;color:var(--or);line-height:1.8;max-width:360px;text-align:left}
-.trk-stop{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:var(--rd);padding:12px 28px;border-radius:12px;font-family:var(--hd);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;border-width:1px}
+.trk-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:20px;padding:40px 24px;text-align:center;position:relative;z-index:2}
+.trk-ring{position:absolute;width:160px;height:160px;border-radius:50%;border:1.5px solid rgba(0,229,255,.12);animation:trkRing 3s ease-out infinite;pointer-events:none}
+.trk-ring:nth-child(2){animation-delay:1s}.trk-ring:nth-child(3){animation-delay:2s}
+.trk-icon{width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,rgba(0,229,255,.18),rgba(0,229,255,.04));border:2px solid var(--cy);display:grid;place-items:center;font-size:34px;box-shadow:0 0 36px rgba(0,229,255,.25);position:relative;z-index:1}
+.trk-title{font-size:20px;font-weight:800;letter-spacing:-.5px;position:relative;z-index:1}
+.trk-sub{font-family:var(--mo);font-size:11px;color:var(--mt);line-height:1.8;position:relative;z-index:1}
+.trk-coords{font-family:var(--mo);font-size:13px;color:var(--cy);background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.15);padding:8px 16px;border-radius:10px;min-width:220px;line-height:2;position:relative;z-index:1}
+.trk-meta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1}
+.trk-chip{font-family:var(--mo);font-size:10px;background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:6px 12px;color:var(--mt);text-align:center}
+.trk-chip b{color:var(--tx);display:block;font-size:13px;margin-top:2px}
+.trk-warn{background:rgba(249,115,22,.07);border:1px solid rgba(249,115,22,.22);border-radius:12px;padding:11px 14px;font-family:var(--mo);font-size:11px;color:var(--or);line-height:1.8;max-width:340px;text-align:left;position:relative;z-index:1}
+.trk-stop{background:rgba(239,68,68,.1);border:1.5px solid rgba(239,68,68,.35);color:var(--rd);padding:12px 28px;border-radius:12px;font-family:var(--hd);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;position:relative;z-index:1}
 .trk-stop:active{transform:scale(.96)}
-
-/* ── ADMIN PANEL additions ── */
+/* admin freq */
 .freq-row{display:flex;gap:6px;flex-wrap:wrap}
-.freq-btn{flex:1;min-width:70px;padding:9px 8px;border:1px solid var(--b1);border-radius:9px;background:var(--s2);color:var(--mt);font-family:var(--mo);font-size:11px;cursor:pointer;transition:all .15s;text-align:center}
+.freq-btn{flex:1;min-width:60px;padding:9px 4px;border:1px solid var(--b1);border-radius:9px;background:var(--s2);color:var(--mt);font-family:var(--mo);font-size:11px;cursor:pointer;transition:all .15s;text-align:center}
 .freq-btn.sel{border-color:var(--cy);color:var(--cy);background:rgba(0,229,255,.06)}
 .freq-btn:active{transform:scale(.95)}
-
+/* keyframes */
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 @keyframes sosRing{0%{transform:scale(.8);opacity:.8}100%{transform:scale(2.1);opacity:0}}
-@keyframes sosG{from{box-shadow:0 0 26px rgba(239,68,68,.5)}to{box-shadow:0 0 58px rgba(239,68,68,.9),0 0 100px rgba(239,68,68,.3)}}
+@keyframes sosG{from{box-shadow:0 0 26px rgba(239,68,68,.5)}to{box-shadow:0 0 58px rgba(239,68,68,.9)}}
+@keyframes trkRing{0%{transform:scale(.5);opacity:.7}100%{transform:scale(2.2);opacity:0}}
 </style>
 </head>
 <body>
 
-<!-- HOME -->
+<!-- ══ HOME ══════════════════════════════════════════════════════════════ -->
 <div id="home-screen" class="screen active">
 <div class="si">
   <div class="brand">
     <div class="bi">📡</div>
     <div><div class="bn">PingMe</div><div class="bt">Live Location Sharing</div></div>
   </div>
+
   <div class="card" style="animation-delay:.05s">
     <div class="ch"><div class="cl">Your Identity</div></div>
     <div class="cb" style="padding:12px">
@@ -206,6 +213,8 @@ input.ni::placeholder{letter-spacing:.5px}
             <span onclick="setEmoji(this)" style="cursor:pointer;font-size:19px;padding:2px">🧑</span>
             <span onclick="setEmoji(this)" style="cursor:pointer;font-size:19px;padding:2px">👩</span>
             <span onclick="setEmoji(this)" style="cursor:pointer;font-size:19px;padding:2px">🧔</span>
+            <span onclick="setEmoji(this)" style="cursor:pointer;font-size:19px;padding:2px">👦</span>
+            <span onclick="setEmoji(this)" style="cursor:pointer;font-size:19px;padding:2px">👧</span>
             <span onclick="setEmoji(this)" style="cursor:pointer;font-size:19px;padding:2px">🚗</span>
             <span onclick="setEmoji(this)" style="cursor:pointer;font-size:19px;padding:2px">🏃</span>
             <span onclick="setEmoji(this)" style="cursor:pointer;font-size:19px;padding:2px">🚴</span>
@@ -215,28 +224,27 @@ input.ni::placeholder{letter-spacing:.5px}
       </div>
     </div>
   </div>
+
   <button class="btn bc" onclick="startSharing()" style="animation-delay:.08s">📍 Share My Location</button>
   <div class="divider" style="animation-delay:.11s">join a session</div>
 
-  <!-- invite banner — visible only when ?room= detected -->
+  <!-- invite banner — shown when ?room= link opened -->
   <div id="autojoin-banner" style="display:none;width:100%">
-    <div style="background:linear-gradient(135deg,rgba(139,92,246,.14),rgba(0,229,255,.07));border:1.5px solid var(--pu);border-radius:16px;padding:20px 16px;display:flex;flex-direction:column;gap:14px;">
-      <!-- header -->
+    <div style="background:linear-gradient(135deg,rgba(139,92,246,.14),rgba(0,229,255,.07));border:1.5px solid var(--pu);border-radius:16px;padding:20px 16px;display:flex;flex-direction:column;gap:14px">
       <div style="display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center">
-        <div style="font-size:26px">🔗</div>
+        <div style="font-size:24px">🔗</div>
         <div style="font-size:15px;font-weight:700">You were invited to join</div>
         <div id="banner-code" style="font-family:var(--mo);font-size:30px;font-weight:500;letter-spacing:10px;background:linear-gradient(90deg,var(--cy),var(--pu));-webkit-background-clip:text;-webkit-text-fill-color:transparent">——</div>
       </div>
-      <!-- name entry inside banner -->
-      <div style="background:rgba(0,0,0,.2);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;">
+      <div style="background:rgba(0,0,0,.2);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px">
         <div style="font-family:var(--mo);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--mt)">Your name &amp; avatar</div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div id="banner-emoji-prev" style="width:40px;height:40px;border-radius:50%;background:rgba(139,92,246,.15);border:1.5px solid var(--pu);display:grid;place-items:center;font-size:20px;flex-shrink:0;cursor:pointer" onclick="toggleBannerEmojiPicker()">👤</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div id="banner-emoji-prev" onclick="toggleBannerEmojiPicker()" style="width:40px;height:40px;border-radius:50%;background:rgba(139,92,246,.15);border:1.5px solid var(--pu);display:grid;place-items:center;font-size:20px;flex-shrink:0;cursor:pointer">👤</div>
           <input type="text" id="banner-name" class="ni" placeholder="Enter your name to join…" maxlength="20"
             style="flex:1;padding:11px 13px;font-size:14px;letter-spacing:.5px;text-transform:none;border-color:rgba(139,92,246,.4)"
-            oninput="onBannerNameInput()" onkeydown="if(event.key==='Enter')joinRoom()"/>
+            oninput="onBannerNameInput()" onkeydown="if(event.key==='Enter')joinRoom(false)"/>
         </div>
-        <div id="banner-emoji-picker" style="display:none;display:flex;gap:4px;flex-wrap:wrap">
+        <div id="banner-emoji-picker" style="display:none;flex-wrap:wrap;gap:4px">
           <span onclick="setBannerEmoji(this)" style="cursor:pointer;font-size:22px;padding:3px">👤</span>
           <span onclick="setBannerEmoji(this)" style="cursor:pointer;font-size:22px;padding:3px">🧑</span>
           <span onclick="setBannerEmoji(this)" style="cursor:pointer;font-size:22px;padding:3px">👩</span>
@@ -248,17 +256,13 @@ input.ni::placeholder{letter-spacing:.5px}
           <span onclick="setBannerEmoji(this)" style="cursor:pointer;font-size:22px;padding:3px">🚴</span>
           <span onclick="setBannerEmoji(this)" style="cursor:pointer;font-size:22px;padding:3px">⭐</span>
         </div>
-        <div id="banner-name-err" style="display:none;font-family:var(--mo);font-size:11px;color:var(--rd);padding:2px 0">⚠️ Please enter your name before joining</div>
+        <div id="banner-name-err" style="display:none;font-family:var(--mo);font-size:11px;color:var(--rd)">⚠️ Please enter your name before joining</div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:8px;width:100%">
-        <button class="btn bp" id="autojoin-btn" onclick="joinRoom(false)" style="width:100%;font-size:15px;padding:15px">
-          <span id="autojoin-btn-text">🚀 Join Room Now</span>
-        </button>
-        <button class="btn bc" onclick="joinRoom(true)" style="font-size:13px;padding:12px">
-          📡 Join as Silent Tracker
-        </button>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="btn bp" id="autojoin-btn" onclick="joinRoom(false)"><span id="autojoin-btn-text">🚀 Join Room Now</span></button>
+        <button class="btn bc bsm" onclick="joinRoom(true)">📡 Join as Silent Tracker</button>
       </div>
-      <div style="font-size:11px;font-family:var(--mo);color:var(--mt);text-align:center">Silent tracker: minimal UI, keeps pinging even when screen dims</div>
+      <div style="font-size:11px;font-family:var(--mo);color:var(--mt);text-align:center">or enter a different code below</div>
     </div>
   </div>
 
@@ -271,6 +275,7 @@ input.ni::placeholder{letter-spacing:.5px}
       <button class="btn bgh bsm" onclick="joinRoom(true)">📡 Join as Silent Tracker</button>
     </div>
   </div>
+
   <div class="divider" style="animation-delay:.16s">emergency</div>
   <div class="card" style="animation-delay:.19s;border-color:rgba(239,68,68,.2);isolation:isolate">
     <div class="ch"><div class="cl">SOS Emergency Broadcast</div><div class="pill"><div class="dot sos"></div>No room needed</div></div>
@@ -285,7 +290,7 @@ input.ni::placeholder{letter-spacing:.5px}
 </div>
 </div>
 
-<!-- SHARE -->
+<!-- ══ SHARE ══════════════════════════════════════════════════════════════ -->
 <div id="share-screen" class="screen">
 <div class="si">
   <div class="brand">
@@ -293,37 +298,63 @@ input.ni::placeholder{letter-spacing:.5px}
     <div><div class="bn">PingMe</div><div class="bt">Broadcasting Live</div></div>
     <div class="pill" style="margin-left:auto"><div class="dot share"></div><span id="share-status-text">Getting GPS…</span></div>
   </div>
+
   <div class="card">
     <div class="ch"><div class="cl">Your Room Code</div></div>
     <div class="cb" style="display:flex;flex-direction:column;align-items:center;gap:8px">
       <div class="code-big" id="display-code">——</div>
       <div class="code-hint">Share this code so others can track you</div>
-      <div class="cbox" id="my-coords-box" style="display:none;width:100%"><span>LAT</span><span id="my-lat">—</span><span style="margin-left:5px">LON</span><span id="my-lon">—</span><span style="margin-left:5px">±</span><span id="my-acc">—</span>m</div>
+      <div class="cbox" id="my-coords-box" style="display:none;width:100%">
+        <span>LAT</span><span id="my-lat">—</span>
+        <span style="margin-left:5px">LON</span><span id="my-lon">—</span>
+        <span style="margin-left:5px">±</span><span id="my-acc">—</span>m
+      </div>
     </div>
   </div>
-  <div class="stitle">📤 Share Location</div>
+
+  <div style="font-family:var(--mo);font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--mt);width:100%;padding:0 2px">📤 Share Location</div>
   <div class="card">
     <div class="cb" style="display:flex;flex-direction:column;gap:8px;padding:12px">
       <div class="brow">
         <button class="btn bgh bsm" onclick="copyCode()">📋 Copy Code</button>
         <button class="btn bgh bsm" onclick="shareLink()">🔗 Copy Link</button>
       </div>
-      <button class="btn bw" onclick="shareWA('room')">
+      <button class="btn bw" onclick="shareWA()">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
         Share Room via WhatsApp
       </button>
-      <button class="btn bgh bsm" onclick="shareGMaps('current')">🗺️ Send Google Maps Link via WhatsApp</button>
+      <button class="btn bgh bsm" onclick="shareGMaps()">🗺️ Send Google Maps Link via WhatsApp</button>
       <button class="btn bgh bsm" onclick="copyGPS()">📌 Copy GPS Coordinates</button>
     </div>
   </div>
-  <div class="stitle">👥 People in Room</div>
+
+  <!-- Admin ping frequency control -->
+  <div class="card" style="border-color:rgba(0,229,255,.2)">
+    <div class="ch">
+      <div class="cl">⚙️ Tracker Ping Frequency</div>
+      <div class="pill"><div class="dot share"></div><span style="color:var(--cy)">Admin</span></div>
+    </div>
+    <div class="cb" style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-family:var(--mo);font-size:11px;color:var(--mt);line-height:1.7">Set how often silent trackers ping their location. Lower = more battery use.</div>
+      <div class="freq-row">
+        <div class="freq-btn" data-ms="10000" onclick="setFreq(10000)">10s</div>
+        <div class="freq-btn sel" data-ms="30000" onclick="setFreq(30000)">30s</div>
+        <div class="freq-btn" data-ms="60000" onclick="setFreq(60000)">1 min</div>
+        <div class="freq-btn" data-ms="120000" onclick="setFreq(120000)">2 min</div>
+        <div class="freq-btn" data-ms="300000" onclick="setFreq(300000)">5 min</div>
+      </div>
+      <div id="freq-status" style="font-family:var(--mo);font-size:11px;color:var(--cy)">Current: 30 seconds</div>
+    </div>
+  </div>
+
+  <div style="font-family:var(--mo);font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--mt);width:100%;padding:0 2px">👥 People in Room</div>
   <div class="card"><div class="ulist" id="user-list-share"><div class="uitem" style="justify-content:center;font-family:var(--mo);font-size:12px;color:var(--mt);padding:18px">Waiting for others…</div></div></div>
+
   <div class="brow">
     <button class="btn bg bsm" onclick="goToMap()">🗺️ View Map</button>
     <button class="btn bgh bsm" onclick="stopSharing()">✕ Stop Sharing</button>
   </div>
-  <!-- Admin freq control injected here dynamically -->
-  <div id="share-admin-slot" style="width:100%"></div>
+
   <div class="card" style="border-color:rgba(239,68,68,.2)">
     <div class="cb" style="padding:12px;display:flex;align-items:center;gap:12px">
       <button class="sos-btn" id="share-sos-btn" onclick="activateSOS()" style="width:58px;height:58px;font-size:9px;flex-shrink:0"><span style="font-size:19px">🆘</span><span>SOS</span></button>
@@ -333,25 +364,25 @@ input.ni::placeholder{letter-spacing:.5px}
 </div>
 </div>
 
-<!-- MAP -->
+<!-- ══ MAP ════════════════════════════════════════════════════════════════ -->
 <div id="map-screen" class="screen">
   <div id="map"></div>
   <div class="map-top">
     <button class="mbk" onclick="leaveMap()">← Back</button>
     <div class="mrb" id="map-room-label">——</div>
-    <div class="pill" style="margin-left:auto"><div class="dot live"></div><span id="map-status-text">Live</span></div>
+    <div class="pill" style="margin-left:auto"><div class="dot live"></div><span>Live</span></div>
   </div>
   <div class="map-bot">
     <div class="mleg" id="map-legend"><div class="li"><div class="ld" style="background:var(--cy)"></div><span>Me</span></div></div>
     <div class="mbr">
       <button class="btn bgh bsm" onclick="centerMap()">⌖ Center</button>
       <button class="btn bgh bsm" onclick="openPanel()">👥 Users</button>
-      <button class="btn bw bsm" onclick="shareGMaps('current')">📤 Share</button>
+      <button class="btn bw bsm" onclick="shareGMaps()">📤 Share</button>
     </div>
   </div>
 </div>
 
-<!-- SOS -->
+<!-- ══ SOS ════════════════════════════════════════════════════════════════ -->
 <div id="sos-screen" class="screen">
 <div class="si">
   <div class="brand">
@@ -363,18 +394,21 @@ input.ni::placeholder{letter-spacing:.5px}
   <div class="card" style="border-color:rgba(239,68,68,.3)">
     <div class="ch"><div class="cl" style="color:var(--rd)">Live SOS Coordinates</div></div>
     <div class="cb" style="display:flex;flex-direction:column;gap:10px">
-      <div class="cbox" style="border-color:rgba(239,68,68,.3);color:var(--rd)"><span style="color:rgba(239,68,68,.6)">LAT</span><span id="sos-lat">—</span><span style="margin-left:5px;color:rgba(239,68,68,.6)">LON</span><span id="sos-lon">—</span></div>
+      <div class="cbox" style="border-color:rgba(239,68,68,.3);color:var(--rd)">
+        <span style="color:rgba(239,68,68,.6)">LAT</span><span id="sos-lat">—</span>
+        <span style="margin-left:5px;color:rgba(239,68,68,.6)">LON</span><span id="sos-lon">—</span>
+      </div>
       <div id="sos-nearby-count" style="font-family:var(--mo);font-size:12px;color:var(--mt)">Searching for nearby users…</div>
     </div>
   </div>
-  <div class="stitle">📣 Notify Emergency Contacts</div>
+  <div style="font-family:var(--mo);font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--mt);width:100%;padding:0 2px">📣 Notify Emergency Contacts</div>
   <div class="card">
     <div class="cb" style="display:flex;flex-direction:column;gap:8px;padding:12px">
       <button class="btn bw" onclick="shareSOSWA()">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
         Send SOS via WhatsApp
       </button>
-      <button class="btn bgh bsm" onclick="shareGMaps('sos')">🗺️ Send Google Maps Link via WhatsApp</button>
+      <button class="btn bgh bsm" onclick="shareSOSMap()">🗺️ Send Google Maps Link via WhatsApp</button>
       <button class="btn br bsm" onclick="callEmergency()">📞 Call Emergency Services (999)</button>
     </div>
   </div>
@@ -383,654 +417,48 @@ input.ni::placeholder{letter-spacing:.5px}
 </div>
 </div>
 
-
-<!-- SILENT TRACKER SCREEN -->
+<!-- ══ SILENT TRACKER ═════════════════════════════════════════════════════ -->
 <div id="tracker-screen" class="screen">
   <div class="trk-wrap">
-    <div class="trk-pulse-ring"></div>
-    <div class="trk-pulse-ring"></div>
-    <div class="trk-pulse-ring"></div>
-    <div class="trk-center">
-      <div class="trk-icon" id="trk-icon">📡</div>
-      <div class="trk-status" id="trk-status-txt">Acquiring GPS…</div>
-      <div class="trk-sub" id="trk-room-txt">Silent tracking active</div>
-      <div class="trk-coords" id="trk-coords">
-        <span style="color:var(--mt)">LAT</span> <span id="trk-lat">——</span><br>
-        <span style="color:var(--mt)">LON</span> <span id="trk-lon">——</span>
-      </div>
-      <div class="trk-meta">
-        <div class="trk-chip"><span>Pings sent</span><b id="trk-pings">0</b></div>
-        <div class="trk-chip"><span>Interval</span><b id="trk-interval-disp">—</b></div>
-        <div class="trk-chip"><span>Last ping</span><b id="trk-last">—</b></div>
-        <div class="trk-chip"><span>Accuracy</span><b id="trk-acc-disp">—</b></div>
-      </div>
-      <div class="wake-warn">
-        ⚠️ <b>Keep this screen open</b> for continuous tracking.<br>
-        Screen may lock — tap to wake if pings stop.<br>
-        <span style="color:var(--mt)">Browser limitation: tracking pauses if app is fully closed.</span>
-      </div>
-      <div class="trk-freq" id="trk-freq-txt"></div>
-      <button class="trk-stop" onclick="stopSilentTracker()">■ Stop Tracking &amp; Leave Room</button>
+    <div class="trk-ring"></div><div class="trk-ring"></div><div class="trk-ring"></div>
+    <div class="trk-icon" id="trk-icon">📡</div>
+    <div class="trk-title" id="trk-title">Acquiring GPS…</div>
+    <div class="trk-sub" id="trk-sub">Silent tracking active</div>
+    <div class="trk-coords">
+      <span style="color:var(--mt)">LAT</span> <span id="trk-lat">——</span><br>
+      <span style="color:var(--mt)">LON</span> <span id="trk-lon">——</span>
     </div>
+    <div class="trk-meta">
+      <div class="trk-chip"><span>Pings sent</span><b id="trk-pings">0</b></div>
+      <div class="trk-chip"><span>Interval</span><b id="trk-interval-disp">—</b></div>
+      <div class="trk-chip"><span>Last ping</span><b id="trk-last">—</b></div>
+      <div class="trk-chip"><span>Accuracy</span><b id="trk-acc-disp">—</b></div>
+    </div>
+    <div class="trk-warn">
+      ⚠️ <b>Keep this screen open</b> for continuous tracking.<br>
+      The app will request to keep your screen on.<br>
+      <span style="color:var(--mt)">Closing the browser stops all pings (browser limitation).</span>
+    </div>
+    <div style="font-family:var(--mo);font-size:11px;color:var(--cy)" id="trk-freq-label"></div>
+    <button class="trk-stop" onclick="stopSilentTracker()">■ Stop Tracking &amp; Leave Room</button>
   </div>
 </div>
 
-<!-- ADMIN PANEL — frequency control (shown on share screen) -->
-<div id="admin-freq-card" style="display:none;width:100%;max-width:420px">
-  <div class="card" style="border-color:rgba(0,229,255,.2)">
-    <div class="ch">
-      <div class="cl">⚙️ Tracker Frequency</div>
-      <div class="pill"><div class="dot share"></div><span style="color:var(--cy)">Admin</span></div>
-    </div>
-    <div class="cb" style="display:flex;flex-direction:column;gap:10px">
-      <div style="font-family:var(--mo);font-size:11px;color:var(--mt);line-height:1.7">
-        Set how often trackers ping their location to the database. Lower = more battery drain.
-      </div>
-      <div class="freq-row" id="freq-btn-row">
-        <div class="freq-btn" onclick="setFreq(10000)">10s</div>
-        <div class="freq-btn sel" onclick="setFreq(30000)">30s</div>
-        <div class="freq-btn" onclick="setFreq(60000)">1 min</div>
-        <div class="freq-btn" onclick="setFreq(120000)">2 min</div>
-        <div class="freq-btn" onclick="setFreq(300000)">5 min</div>
-      </div>
-      <div id="freq-status" style="font-family:var(--mo);font-size:11px;color:var(--cy)">Current: 30 seconds</div>
-    </div>
-  </div>
-</div>
-
-<!-- PANEL -->
+<!-- ══ PANEL ══════════════════════════════════════════════════════════════ -->
 <div class="pov" id="pov" onclick="closePanel()"></div>
 <div class="panel" id="panel">
   <div class="ph"></div>
   <div class="pt">👥 Room Members</div>
   <div class="pb">
     <div class="card" style="padding:0;overflow:hidden"><div class="ulist" id="panel-ulist"><div class="uitem" style="justify-content:center;font-family:var(--mo);font-size:12px;color:var(--mt);padding:18px">Loading…</div></div></div>
-    <button class="btn bw" onclick="shareWA('room')">
+    <button class="btn bw" onclick="shareWA()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
       Share Room Link via WhatsApp
     </button>
   </div>
 </div>
 
-<div id="toast"></div>
-
-<script>
-// ── Firebase wrappers (window._FB set by module above) ──────────────────
-function fbRef(p)    { return window._FB.ref(window._FB.db, p); }
-function fbSet(p,d)  { return window._FB.set(fbRef(p), d); }
-function fbGet(p)    { return window._FB.get(fbRef(p)); }
-function fbDel(p)    { return window._FB.remove(fbRef(p)); }
-function fbOn(p,cb)  { const u=window._FB.onValue(fbRef(p),cb); S.listeners.push(u); return u; }
-function cleanL()    { S.listeners.forEach(u=>{try{u()}catch(e){}}); S.listeners=[]; }
-
-// ── State ───────────────────────────────────────────────────────────────
-const S = {
-  mode:null, roomCode:null,
-  myId:(()=>Math.random().toString(36).slice(2,10))(),
-  myName:'User', myEmoji:'👤',
-  myPos:null, watchId:null,
-  sosActive:false, sosWatchId:null,
-  map:null, markers:{}, users:{},
-  listeners:[], firebaseOk:false,
-  appUrl:location.href.split('?')[0]
-};
-function rCode(){ return Array.from({length:6},()=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random()*32)]).join(''); }
-
-// ── Firebase ready ───────────────────────────────────────────────────────
-document.addEventListener('firebase-ready', ()=>{
-  S.firebaseOk=true;
-  watchSOSChannel();
-});
-
-// ── UI helpers ──────────────────────────────────────────────────────────
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  if(id==='map-screen'&&S.map) setTimeout(()=>S.map.invalidateSize(),150);
-}
-function showToast(msg,ms=2800){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),ms);
-}
-function tAgo(ts){ const s=Math.round((Date.now()-ts)/1000); return s<10?'now':s<60?s+'s':s<3600?Math.floor(s/60)+'m':Math.floor(s/3600)+'h'; }
-function hav(a,b,c,d){ const R=6371,da=(c-a)*Math.PI/180,db=(d-b)*Math.PI/180,x=Math.sin(da/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(db/2)**2; return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x)); }
-function onNameInput(){ S.myName=document.getElementById('username-input').value.trim()||'User'; }
-function onBannerNameInput(){
-  const v=document.getElementById('banner-name').value.trim();
-  const errEl=document.getElementById('banner-name-err');
-  if(errEl) errEl.style.display='none';
-  // Mirror to home screen name input and state
-  S.myName=v||'User';
-  document.getElementById('username-input').value=v;
-}
-function toggleBannerEmojiPicker(){
-  const p=document.getElementById('banner-emoji-picker');
-  p.style.display=(p.style.display==='none'||!p.style.display)?'flex':'none';
-}
-function setBannerEmoji(el){
-  S.myEmoji=el.textContent;
-  document.getElementById('banner-emoji-prev').textContent=el.textContent;
-  document.getElementById('name-emoji').textContent=el.textContent;
-  document.getElementById('banner-emoji-picker').style.display='none';
-}
-function setEmoji(el){ S.myEmoji=el.textContent; document.getElementById('name-emoji').textContent=el.textContent; }
-
-// ── GPS ─────────────────────────────────────────────────────────────────
-function gpsW(cb,ecb){
-  if(!navigator.geolocation){showToast('❌ GPS not available');return null;}
-  return navigator.geolocation.watchPosition(
-    p=>cb(p.coords.latitude,p.coords.longitude,p.coords.accuracy),
-    e=>{if(ecb)ecb(e);else showToast('⚠️ GPS: '+e.message);},
-    {enableHighAccuracy:true,maximumAge:4000,timeout:12000}
-  );
-}
-function gpsO(cb){ navigator.geolocation.getCurrentPosition(p=>cb(p.coords.latitude,p.coords.longitude),null,{enableHighAccuracy:true}); }
-function gpsStop(id){ if(id!=null) navigator.geolocation.clearWatch(id); }
-
-// ── Map ─────────────────────────────────────────────────────────────────
-function initMap(lat=3.139,lng=101.687){
-  if(S.map){S.map.remove();S.map=null;} S.markers={};
-  const m=L.map('map',{zoomControl:true,attributionControl:false});
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(m);
-  m.setView([lat,lng],16); S.map=m;
-}
-function mkI(uid){
-  const isMe=uid===S.myId, isSOS=uid.startsWith('sos_');
-  const cls=isSOS?'pm pm-sos':isMe?'pm pm-me':'pm pm-ot';
-  const em=isMe?S.myEmoji:(isSOS?'🆘':(S.users[uid]?.emoji||'👤'));
-  return L.divIcon({className:'',html:`<div class="${cls}">${em}</div>`,iconSize:[42,42],iconAnchor:[21,21]});
-}
-function upsert(uid,lat,lng,pop){
-  if(!S.map)return;
-  if(S.markers[uid]){S.markers[uid].setLatLng([lat,lng]);S.markers[uid].setIcon(mkI(uid));}
-  else{const mk=L.marker([lat,lng],{icon:mkI(uid)}).addTo(S.map);if(pop)mk.bindPopup(pop);S.markers[uid]=mk;}
-}
-function rmMk(uid){ if(S.markers[uid]){S.markers[uid].remove();delete S.markers[uid];} }
-function centerMap(){
-  if(!S.map)return;
-  const pts=Object.values(S.markers).map(m=>m.getLatLng());
-  if(!pts.length)return;
-  if(pts.length===1){S.map.setView(pts[0],16);return;}
-  S.map.fitBounds(L.latLngBounds(pts),{padding:[60,60]});
-}
-
-// ── User list ───────────────────────────────────────────────────────────
-function renderList(id){
-  const el=document.getElementById(id); if(!el)return;
-  const uids=Object.keys(S.users);
-  if(!uids.length){el.innerHTML='<div class="uitem" style="justify-content:center;font-family:var(--mo);font-size:12px;color:var(--mt);padding:18px">No others here yet</div>';return;}
-  el.innerHTML=uids.map(uid=>{
-    const u=S.users[uid],isMe=uid===S.myId;
-    const gm=`https://maps.google.com/?q=${u.lat},${u.lng}`;
-    const waMsg=encodeURIComponent(`📍 ${u.name}'s location:\n${gm}`);
-    const avC=isMe?'av-me':u.sos?'av-sos':'av-ot';
-    return `<div class="uitem"><div class="uav ${avC}">${u.emoji||'👤'}</div><div class="ui"><div class="un">${isMe?'You ('+u.name+')':u.name}${u.sos?' 🆘':''}</div><div class="uc">${u.lat?.toFixed(5)||'—'}, ${u.lng?.toFixed(5)||'—'}</div></div><div class="ut">${tAgo(u.ts||Date.now())}</div><div class="ua">${!isMe?`<button class="ib" onclick="window.open('${gm}','_blank')">🗺️</button><button class="ib" onclick="window.open('https://wa.me/?text=${waMsg}','_blank')">💬</button>`:''}</div></div>`;
-  }).join('');
-}
-function syncUI(){
-  renderList('user-list-share'); renderList('panel-ulist');
-  const leg=document.getElementById('map-legend'); if(!leg)return;
-  let h=`<div class="li"><div class="ld" style="background:var(--cy)"></div><span>${S.myEmoji} Me</span></div>`;
-  Object.entries(S.users).filter(([u])=>u!==S.myId).forEach(([uid,u])=>{
-    h+=`<div class="li"><div class="ld" style="background:${u.sos?'var(--rd)':'var(--pu)'}"></div><span>${u.emoji||'👤'} ${u.name||'User'}${u.sos?' 🆘':''}</span></div>`;
-  });
-  leg.innerHTML=h;
-}
-
-// ── Room listener ───────────────────────────────────────────────────────
-function listenRoom(code){
-  fbOn(`rooms/${code}/users`, snap=>{
-    const data=snap.val()||{};
-    Object.keys(S.users).forEach(uid=>{ if(!data[uid]) rmMk(uid); });
-    S.users=data;
-    Object.entries(data).forEach(([uid,u])=>{
-      if(!u.lat)return;
-      upsert(uid,u.lat,u.lng,`<b>${u.emoji||'👤'} ${u.name||'User'}</b><br>${u.lat.toFixed(5)}, ${u.lng.toFixed(5)}`);
-    });
-    syncUI();
-    const ot=Object.keys(data).filter(u=>u!==S.myId);
-    const st=document.getElementById('share-status-text');
-    if(st) st.textContent=ot.length?`${ot.length} watching`:'Broadcasting';
-  });
-}
-
-// ── Share my location ───────────────────────────────────────────────────
-async function startSharing(){
-  if(!S.firebaseOk){showToast('⚠️ Firebase not ready yet');return;}
-  S.mode='sharer'; S.roomCode=rCode();
-  document.getElementById('display-code').textContent=S.roomCode;
-  document.getElementById('map-room-label').textContent=S.roomCode;
-  showScreen('share-screen');
-  S.watchId=gpsW(async(lat,lng,acc)=>{
-    S.myPos={lat,lng,acc};
-    document.getElementById('my-coords-box').style.display='flex';
-    document.getElementById('my-lat').textContent=lat.toFixed(5);
-    document.getElementById('my-lon').textContent=lng.toFixed(5);
-    document.getElementById('my-acc').textContent=Math.round(acc);
-    try {
-      await fbSet(`rooms/${S.roomCode}/users/${S.myId}`,{lat,lng,acc,ts:Date.now(),name:S.myName,emoji:S.myEmoji,role:'sharer'});
-    } catch(e) {
-      if(e.code==='PERMISSION_DENIED'||(e.message&&e.message.includes('PERMISSION_DENIED'))) { showFirebaseRulesHelp(); return; }
-    }
-    if(S.map) upsert(S.myId,lat,lng);
-  });
-  listenRoom(S.roomCode);
-  showAdminFreqPanel();
-}
-async function stopSharing(){
-  gpsStop(S.watchId); S.watchId=null; cleanL();
-  if(S.roomCode) await fbDel(`rooms/${S.roomCode}/users/${S.myId}`);
-  S.roomCode=null; S.mode=null; S.users={};
-  if(S.map){S.map.remove();S.map=null;}
-  showScreen('home-screen'); showToast('📴 Stopped sharing');
-}
-
-// ── Join room ───────────────────────────────────────────────────────────
-async function joinRoom(silentMode=false){
-  if(!S.firebaseOk){ showToast('⚠️ Firebase not ready yet'); return; }
-  const code=document.getElementById('join-code').value.trim().toUpperCase();
-  if(code.length!==6){ showToast('⚠️ Enter the full 6-character code'); return; }
-
-  // If coming from a link (banner visible), validate the banner name field
-  const bannerVisible = document.getElementById('autojoin-banner')?.style.display !== 'none';
-  if(bannerVisible) {
-    const bannerName = document.getElementById('banner-name')?.value.trim();
-    const errEl = document.getElementById('banner-name-err');
-    if(!bannerName) {
-      if(errEl) errEl.style.display='block';
-      document.getElementById('banner-name')?.focus();
-      return;
-    }
-    if(errEl) errEl.style.display='none';
-    // Apply banner name/emoji to state
-    S.myName = bannerName;
-    document.getElementById('username-input').value = bannerName;
-    onNameInput();
-  } else {
-    // Manual join from home — use home screen name, default if empty
-    if(!S.myName || S.myName==='User') {
-      const homeName = document.getElementById('username-input')?.value.trim();
-      S.myName = homeName || 'User_'+S.myId.slice(0,4);
-    }
-  }
-
-  // Show loading state
-  const btn=document.getElementById('autojoin-btn');
-  const txt=document.getElementById('autojoin-btn-text');
-  if(btn){ btn.disabled=true; } if(txt){ txt.textContent='⏳ Joining…'; }
-  showToast('🔍 Looking up room…');
-
-  let snap;
-  try {
-    // fbGet uses Firebase get() — a proper one-shot read, no subscription, no race
-    snap = await fbGet(`rooms/${code}/users`);
-  } catch(e) {
-    console.error('joinRoom fbGet error:', e.code, e.message);
-    if(btn){ btn.disabled=false; } if(txt){ txt.textContent='🚀 Join Room Now'; }
-    if(e.code === 'PERMISSION_DENIED' || (e.message && e.message.includes('PERMISSION_DENIED'))) {
-      showFirebaseRulesHelp();
-    } else {
-      showToast('❌ ' + (e.message || 'Database error'));
-    }
-    return;
-  }
-
-  if(!snap.exists()){
-    showToast('❌ Room not found — check the code and try again');
-    if(btn){ btn.disabled=false; } if(txt){ txt.textContent='🚀 Join Room Now'; }
-    return;
-  }
-
-  S.mode='tracker'; S.roomCode=code; S.users=snap.val()||{};
-  document.getElementById('map-room-label').textContent=code;
-
-  // Read admin-set frequency if present
-  try {
-    const freqSnap = await fbGet(`rooms/${code}/meta/freqMs`);
-    if(freqSnap.exists()) TRK.freqMs = freqSnap.val();
-  } catch(e){}
-
-  if(silentMode){
-    // SILENT TRACKER MODE — interval-based pings, minimal UI
-    await startSilentTracker();
-  } else {
-    // NORMAL MODE — continuous GPS watch + map view
-    goToMap();
-    S.watchId=gpsW(async(lat,lng,acc)=>{
-      S.myPos={lat,lng,acc};
-      await fbSet(`rooms/${S.roomCode}/users/${S.myId}`,{lat,lng,acc,ts:Date.now(),name:S.myName,emoji:S.myEmoji,role:'tracker'});
-      if(S.map) upsert(S.myId,lat,lng);
-    });
-    listenRoom(code);
-  }
-}
-
-function goToMap(){
-  showScreen('map-screen');
-  setTimeout(()=>{
-    const p=S.myPos||{lat:3.139,lng:101.687};
-    initMap(p.lat,p.lng);
-    Object.entries(S.users).forEach(([uid,u])=>{
-      if(!u.lat)return;
-      upsert(uid,u.lat,u.lng,`<b>${u.emoji||'👤'} ${u.name}</b><br>${u.lat.toFixed(5)}, ${u.lng.toFixed(5)}`);
-    });
-    if(S.myPos) upsert(S.myId,S.myPos.lat,S.myPos.lng);
-    syncUI(); centerMap();
-  },120);
-}
-function leaveMap(){
-  if(S.mode==='sharer'){ showScreen('share-screen'); return; }
-  cleanL(); gpsStop(S.watchId); S.watchId=null;
-  if(S.roomCode) fbDel(`rooms/${S.roomCode}/users/${S.myId}`);
-  S.roomCode=null; S.mode=null; S.users={};
-  if(S.map){S.map.remove();S.map=null;}
-  showScreen('home-screen');
-}
-function openPanel(){ renderList('panel-ulist');document.getElementById('panel').classList.add('open');document.getElementById('pov').classList.add('open'); }
-function closePanel(){ document.getElementById('panel').classList.remove('open');document.getElementById('pov').classList.remove('open'); }
-
-// ── WhatsApp / share ────────────────────────────────────────────────────
-function shareWA(type){
-  if(type==='room'&&S.roomCode){
-    const link=`${S.appUrl}?room=${S.roomCode}`;
-    const msg=`📍 *PingMe Live Location*\n\nTracking me in real-time!\n\n🔑 Room Code: *${S.roomCode}*\n🔗 Join: ${link}\n\nTap the link or enter the code in PingMe.`;
-    const w=window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
-    if(!w) navigator.clipboard.writeText(link).then(()=>showToast('✅ Link copied!')).catch(()=>showToast(link));
-  }
-}
-function shareGMaps(ctx){
-  const p=S.myPos; if(!p){showToast('⚠️ GPS not ready yet');return;}
-  const gm=`https://maps.google.com/?q=${p.lat},${p.lng}`, nm=S.myName||'Me';
-  const msg=ctx==='sos'
-    ?`🆘 *SOS EMERGENCY*\n\n*${nm}* needs immediate help!\n\n📍 Location:\n${gm}\n\n📌 ${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}\n⏰ ${new Date().toLocaleTimeString()}`
-    :`📍 *${nm}'s Location*\n\n${gm}\n\nCoords: ${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}`;
-  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
-}
-function copyCode(){ if(!S.roomCode)return; navigator.clipboard.writeText(S.roomCode).then(()=>showToast('✅ Code copied!')).catch(()=>showToast('Code: '+S.roomCode)); }
-function shareLink(){ if(!S.roomCode)return; const link=`${S.appUrl}?room=${S.roomCode}`; navigator.clipboard.writeText(link).then(()=>showToast('✅ Link copied!')).catch(()=>showToast(link)); }
-function copyGPS(){ const p=S.myPos; if(!p){showToast('⚠️ GPS not ready');return;} navigator.clipboard.writeText(`${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}`).then(()=>showToast('✅ Copied!')).catch(()=>{}); }
-
-// ── SOS ─────────────────────────────────────────────────────────────────
-async function activateSOS(){
-  if(!S.firebaseOk){showToast('⚠️ Firebase not ready');return;}
-  if(!confirm('🆘 ACTIVATE SOS?\n\nBroadcasts your location to ALL nearby PingMe users.\n\nGenuine emergencies only. OK to confirm.')) return;
-  S.sosActive=true;
-  document.querySelectorAll('.sos-btn').forEach(b=>b.classList.add('active-sos'));
-  showScreen('sos-screen');
-  gpsO(async(lat,lng)=>{
-    S.myPos={lat,lng};
-    document.getElementById('sos-lat').textContent=lat.toFixed(6);
-    document.getElementById('sos-lon').textContent=lng.toFixed(6);
-    await fbSet(`sos/${S.myId}`,{lat,lng,ts:Date.now(),name:S.myName,emoji:S.myEmoji,active:true});
-    showToast('🆘 SOS broadcast active',5000);
-  });
-  S.sosWatchId=gpsW(async(lat,lng,acc)=>{
-    S.myPos={lat,lng,acc};
-    document.getElementById('sos-lat').textContent=lat.toFixed(6);
-    document.getElementById('sos-lon').textContent=lng.toFixed(6);
-    await fbSet(`sos/${S.myId}`,{lat,lng,acc,ts:Date.now(),name:S.myName,emoji:S.myEmoji,active:true});
-  });
-  fbOn('sos',snap=>{
-    const sos=snap.val()||{},mp=S.myPos;
-    const resp=Object.entries(sos).filter(([uid,u])=>uid!==S.myId&&!u.active&&u.lat&&mp&&hav(mp.lat,mp.lng,u.lat,u.lng)<10);
-    document.getElementById('sos-nearby-count').textContent=resp.length?`✅ ${resp.length} PingMe user(s) nearby alerted`:'🔍 Searching for nearby PingMe users…';
-  });
-}
-async function deactivateSOS(){
-  if(!confirm('Confirm you are SAFE and want to cancel SOS.')) return;
-  S.sosActive=false; gpsStop(S.sosWatchId); S.sosWatchId=null;
-  await fbDel(`sos/${S.myId}`);
-  document.querySelectorAll('.sos-btn').forEach(b=>b.classList.remove('active-sos'));
-  cleanL(); showScreen('home-screen'); showToast('✅ SOS cancelled. Stay safe!');
-}
-function shareSOSWA(){ const p=S.myPos||{lat:0,lng:0};const gm=`https://maps.google.com/?q=${p.lat},${p.lng}`;window.open(`https://wa.me/?text=${encodeURIComponent(`🆘 *EMERGENCY SOS*\n\n*${S.myName}* needs immediate help!\n\n📍 Live location:\n${gm}\n\n📌 ${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}\n⏰ ${new Date().toLocaleTimeString()}\n\n_Please call 999 or go to this location._`)}`,'_blank'); }
-function callEmergency(){ if(confirm(`Call 999?\n\n${S.myPos?'Coords: '+S.myPos.lat.toFixed(5)+', '+S.myPos.lng.toFixed(5):''}`) ) window.location.href='tel:999'; }
-
-// ── Watch SOS channel (background) ─────────────────────────────────────
-function watchSOSChannel(){
-  window._FB.onValue(fbRef('sos'), snap=>{
-    const sos=snap.val()||{};
-    Object.entries(sos).forEach(([uid,u])=>{
-      if(!u.active||uid===S.myId||!S.myPos||!u.lat) return;
-      const km=hav(S.myPos.lat,S.myPos.lng,u.lat,u.lng);
-      if(km<50){
-        const dist=km<1?(km*1000).toFixed(0)+'m':km.toFixed(1)+'km';
-        showToast(`🆘 SOS! ${u.name||'Someone'} needs help ${dist} away!`,8000);
-        if(S.map) upsert('sos_'+uid,u.lat,u.lng,`<b>🆘 SOS: ${u.name}</b>`);
-      }
-    });
-  });
-}
-
-// ── URL param auto-join (?room=XXXXXX) ──────────────────────────────────
-(function(){
-  const room=new URLSearchParams(location.search).get('room');
-  if(!room) return;
-  const code=room.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6);
-  if(code.length!==6) return;
-
-  // Show invite banner and pre-fill code
-  document.getElementById('join-code').value=code;
-  const banner=document.getElementById('autojoin-banner');
-  const bannerCode=document.getElementById('banner-code');
-  if(banner) banner.style.display='block';
-  if(bannerCode) bannerCode.textContent=code;
-
-  // Don't auto-join — show banner so user enters their name first
-  // Pre-populate name from home screen input if already filled
-  const homeNameEl = document.getElementById('username-input');
-  const bannerNameEl = document.getElementById('banner-name');
-  if(homeNameEl && bannerNameEl && homeNameEl.value.trim()) {
-    bannerNameEl.value = homeNameEl.value.trim();
-    S.myName = homeNameEl.value.trim();
-  }
-  // Focus the name field after a short delay (banner animation)
-  setTimeout(()=>{ if(bannerNameEl) bannerNameEl.focus(); }, 400);
-})();
-
-// ── Firebase rules help modal ───────────────────────────────────────────
-function showFirebaseRulesHelp(){
-  const m=document.getElementById('rules-modal');
-  m.style.display='flex';
-  showToast('🔒 Permission denied — see fix guide',3000);
-}
-function closeRulesModal(){
-  document.getElementById('rules-modal').style.display='none';
-}
-function copyRules(){
-  const rules = '{
-  "rules": {
-    ".read": true,
-    ".write": true
-  }
-}';
-  navigator.clipboard.writeText(rules)
-    .then(()=>showToast('✅ Rules copied — paste in Firebase Console'))
-    .catch(()=>showToast('Rules: { ".read": true, ".write": true }'));
-}
-
-// ── SILENT TRACKER ENGINE ────────────────────────────────────────────────
-const TRK = {
-  active:       false,
-  silentMode:   false,    // true = show minimal tracker screen
-  pingCount:    0,
-  intervalId:   null,
-  freqMs:       30000,    // default 30s — overridden by admin setting in Firebase
-  wakeLock:     null,
-  lastPos:      null,
-  visHidden:    false,
-};
-
-// ── Admin: set frequency and write to Firebase room ──
-function setFreq(ms){
-  TRK.freqMs = ms;
-  // Update button highlight
-  document.querySelectorAll('.freq-btn').forEach(b=>{
-    b.classList.toggle('sel', parseInt(b.getAttribute('onclick').match(/\d+/)[0])===ms);
-  });
-  const labels = {10000:'10 seconds',30000:'30 seconds',60000:'1 minute',120000:'2 minutes',300000:'5 minutes'};
-  document.getElementById('freq-status').textContent = 'Current: '+(labels[ms]||ms+'ms');
-  // Write freq to Firebase so all trackers in room pick it up
-  if(S.roomCode) fbSet(`rooms/${S.roomCode}/meta/freqMs`, ms);
-  // Restart our own interval if we're tracking
-  if(TRK.active && TRK.intervalId) {
-    clearInterval(TRK.intervalId);
-    TRK.intervalId = setInterval(doPing, TRK.freqMs);
-  }
-}
-
-// ── Listen for admin freq changes (tracker side) ──
-function listenFreq(code){
-  fbOn(`rooms/${code}/meta/freqMs`, snap=>{
-    const ms = snap.val();
-    if(!ms || ms===TRK.freqMs) return;
-    TRK.freqMs = ms;
-    const labels = {10000:'10s',30000:'30s',60000:'1min',120000:'2min',300000:'5min'};
-    const el = document.getElementById('trk-freq-txt');
-    if(el) el.textContent = '📶 Ping every '+(labels[ms]||ms+'ms')+' (set by admin)';
-    // Restart interval with new freq
-    if(TRK.active && TRK.intervalId){
-      clearInterval(TRK.intervalId);
-      TRK.intervalId = setInterval(doPing, TRK.freqMs);
-    }
-  });
-}
-
-// ── Single ping — get latest GPS and push to Firebase ──
-function doPing(){
-  if(!TRK.active || !S.roomCode) return;
-  navigator.geolocation.getCurrentPosition(
-    async pos=>{
-      const {latitude:lat, longitude:lng, accuracy:acc} = pos.coords;
-      S.myPos = {lat,lng,acc};
-      TRK.lastPos = {lat,lng,acc,ts:Date.now()};
-      TRK.pingCount++;
-      // Push to Firebase
-      try {
-        await fbSet(`rooms/${S.roomCode}/users/${S.myId}`,
-          {lat,lng,acc,ts:Date.now(),name:S.myName,emoji:S.myEmoji,role:'tracker',silent:TRK.silentMode});
-      } catch(e){ console.warn('Ping write failed:',e.message); }
-      // Update tracker screen UI
-      updateTrackerUI(lat,lng,acc);
-    },
-    err=>{ console.warn('Ping GPS error:',err.message); updateTrackerStatus('⚠️ GPS error — retrying…'); },
-    {enableHighAccuracy:true, timeout:8000, maximumAge:10000}
-  );
-}
-
-function updateTrackerUI(lat,lng,acc){
-  const el = id=>document.getElementById(id);
-  if(el('trk-lat'))    el('trk-lat').textContent    = lat.toFixed(6);
-  if(el('trk-lon'))    el('trk-lon').textContent    = lng.toFixed(6);
-  if(el('trk-pings'))  el('trk-pings').textContent  = TRK.pingCount;
-  if(el('trk-acc-disp')) el('trk-acc-disp').textContent = Math.round(acc)+'m';
-  if(el('trk-last'))   el('trk-last').textContent   = 'just now';
-  if(el('trk-status-txt')) el('trk-status-txt').textContent = '🟢 Tracking Active';
-  if(el('trk-icon'))   el('trk-icon').textContent   = S.myEmoji||'📡';
-  // Age the "last ping" label every second
-  if(TRK._lastPingTimer) clearInterval(TRK._lastPingTimer);
-  let secs=0;
-  TRK._lastPingTimer = setInterval(()=>{
-    secs++;
-    const lastEl=document.getElementById('trk-last');
-    if(lastEl) lastEl.textContent = secs<60?secs+'s ago':Math.floor(secs/60)+'m ago';
-  },1000);
-}
-
-function updateTrackerStatus(msg){
-  const el=document.getElementById('trk-status-txt');
-  if(el) el.textContent=msg;
-}
-
-// ── Wake Lock — keeps screen on while tracker is active ──
-async function requestWakeLock(){
-  if(!('wakeLock' in navigator)) return;
-  try {
-    TRK.wakeLock = await navigator.wakeLock.request('screen');
-    TRK.wakeLock.addEventListener('release',()=>{
-      // Re-acquire if still tracking (e.g. after tab goes visible again)
-      if(TRK.active) setTimeout(requestWakeLock, 500);
-    });
-    console.log('WakeLock acquired');
-  } catch(e){ console.warn('WakeLock failed:',e.message); }
-}
-
-function releaseWakeLock(){
-  if(TRK.wakeLock){ try{ TRK.wakeLock.release(); }catch(e){} TRK.wakeLock=null; }
-}
-
-// ── Visibility change handler — resume pinging when tab becomes visible ──
-document.addEventListener('visibilitychange',()=>{
-  if(!TRK.active) return;
-  if(document.visibilityState==='visible'){
-    // Re-acquire wake lock if needed
-    if(!TRK.wakeLock) requestWakeLock();
-    // Ping immediately on return
-    doPing();
-  }
-});
-
-// ── Start silent tracker mode ──
-async function startSilentTracker(){
-  TRK.active     = true;
-  TRK.silentMode = true;
-  TRK.pingCount  = 0;
-  // Show tracker screen
-  showScreen('tracker-screen');
-  // Update header
-  const roomEl = document.getElementById('trk-room-txt');
-  if(roomEl) roomEl.textContent = 'Room: '+S.roomCode+' · '+S.myName;
-  const freqLabels = {10000:'10s',30000:'30s',60000:'1min',120000:'2min',300000:'5min'};
-  const freqEl = document.getElementById('trk-freq-txt');
-  if(freqEl) freqEl.textContent='📶 Ping every '+(freqLabels[TRK.freqMs]||TRK.freqMs+'ms');
-  const intEl = document.getElementById('trk-interval-disp');
-  if(intEl) intEl.textContent = freqLabels[TRK.freqMs]||TRK.freqMs+'ms';
-  // Request wake lock to keep screen on
-  await requestWakeLock();
-  // Do first ping immediately
-  doPing();
-  // Start interval
-  TRK.intervalId = setInterval(doPing, TRK.freqMs);
-  // Listen for freq changes from admin
-  listenFreq(S.roomCode);
-  showToast('📡 Silent tracker active — screen kept on',4000);
-}
-
-// ── Stop silent tracker ──
-async function stopSilentTracker(){
-  TRK.active     = false;
-  TRK.silentMode = false;
-  clearInterval(TRK.intervalId); TRK.intervalId=null;
-  if(TRK._lastPingTimer){ clearInterval(TRK._lastPingTimer); TRK._lastPingTimer=null; }
-  releaseWakeLock();
-  gpsStop(S.watchId); S.watchId=null;
-  cleanL();
-  if(S.roomCode) await fbDel(`rooms/${S.roomCode}/users/${S.myId}`);
-  S.roomCode=null; S.mode=null; S.users={};
-  showScreen('home-screen');
-  showToast('📴 Tracker stopped');
-}
-
-// ── Show admin frequency panel when room created ──
-function showAdminFreqPanel(){
-  // Move admin-freq-card into the share-admin-slot
-  const slot = document.getElementById('share-admin-slot');
-  const card = document.getElementById('admin-freq-card');
-  if(slot && card){ slot.appendChild(card); card.style.display='block'; }
-}
-
-// ── Cleanup on tab close ────────────────────────────────────────────────
-window.addEventListener('beforeunload', ()=>{
-  gpsStop(S.watchId); gpsStop(S.sosWatchId);
-  if(TRK.intervalId) clearInterval(TRK.intervalId);
-  releaseWakeLock();
-  if(S.roomCode) fbDel(`rooms/${S.roomCode}/users/${S.myId}`);
-  if(S.sosActive) fbDel(`sos/${S.myId}`);
-});
-</script>
-
-<!-- FIREBASE RULES HELP MODAL -->
+<!-- ══ FIREBASE RULES MODAL ═══════════════════════════════════════════════ -->
 <div id="rules-modal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center">
   <div style="width:100%;max-width:480px;background:var(--s1);border:1px solid rgba(239,68,68,.4);border-bottom:none;border-radius:20px 20px 0 0;padding:24px 20px 40px;overflow-y:auto;max-height:90vh">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
@@ -1038,37 +466,639 @@ window.addEventListener('beforeunload', ()=>{
       <button onclick="closeRulesModal()" style="background:var(--s3);border:1px solid var(--b1);color:var(--tx);border-radius:8px;padding:5px 12px;font-family:var(--mo);font-size:12px;cursor:pointer">✕ Close</button>
     </div>
     <div style="font-family:var(--mo);font-size:12px;color:var(--or);background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.3);border-radius:10px;padding:12px;margin-bottom:16px;line-height:1.8">
-      ⚠️ Your Firebase database rules are blocking access.<br>
-      This is a 2-minute fix in Firebase Console.
+      ⚠️ Your Firebase database rules are blocking access. This is a 2-minute fix.
     </div>
     <div style="display:flex;flex-direction:column;gap:12px;font-size:13px;line-height:1.9">
       <div style="background:var(--s2);border:1px solid var(--b1);border-radius:10px;padding:14px">
         <div style="font-weight:700;margin-bottom:8px">Step 1 — Open Firebase Console</div>
-        <button onclick="window.open('https://console.firebase.google.com/project/ping-me-1c3d9/database/ping-me-1c3d9-default-rtdb/rules','_blank')" style="width:100%;padding:10px;background:linear-gradient(135deg,#f59e0b,#b45309);color:#000;border:none;border-radius:8px;font-family:var(--hd);font-size:13px;font-weight:700;cursor:pointer">
-          🔗 Open Database Rules (tap this)
-        </button>
+        <button onclick="window.open('https://console.firebase.google.com/project/ping-me-1c3d9/database/ping-me-1c3d9-default-rtdb/rules','_blank')" style="width:100%;padding:10px;background:linear-gradient(135deg,#f59e0b,#b45309);color:#000;border:none;border-radius:8px;font-family:var(--hd);font-size:13px;font-weight:700;cursor:pointer">🔗 Open Database Rules</button>
       </div>
       <div style="background:var(--s2);border:1px solid var(--b1);border-radius:10px;padding:14px">
-        <div style="font-weight:700;margin-bottom:8px">Step 2 — Replace ALL rules with this</div>
+        <div style="font-weight:700;margin-bottom:8px">Step 2 — Replace ALL rules with this &amp; click Publish</div>
         <div style="background:#000;border-radius:8px;padding:12px;font-family:var(--mo);font-size:12px;color:#00e5ff;line-height:1.8;position:relative">
-          <div id="rules-code-txt">{
+          <pre style="margin:0">{
   "rules": {
     ".read": true,
     ".write": true
   }
-}</div>
+}</pre>
           <button onclick="copyRules()" style="position:absolute;top:8px;right:8px;background:var(--s2);border:1px solid var(--b1);color:var(--tx);border-radius:6px;padding:4px 10px;font-family:var(--mo);font-size:10px;cursor:pointer">📋 Copy</button>
         </div>
       </div>
-      <div style="background:var(--s2);border:1px solid var(--b1);border-radius:10px;padding:14px">
-        <div style="font-weight:700;margin-bottom:4px">Step 3 — Click Publish</div>
-        <div style="font-family:var(--mo);font-size:11px;color:var(--mt)">Hit the blue "Publish" button in Firebase Console, then come back and try again.</div>
-      </div>
-      <button onclick="closeRulesModal();joinRoom()" style="width:100%;padding:14px;background:linear-gradient(135deg,var(--pu),#6d28d9);color:#fff;border:none;border-radius:11px;font-family:var(--hd);font-size:14px;font-weight:700;cursor:pointer">
-        ✅ Done — Try Joining Again
-      </button>
+      <button onclick="closeRulesModal()" style="width:100%;padding:14px;background:linear-gradient(135deg,var(--pu),#6d28d9);color:#fff;border:none;border-radius:11px;font-family:var(--hd);font-size:14px;font-weight:700;cursor:pointer">✅ Done — Close &amp; Try Again</button>
     </div>
   </div>
 </div>
+
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════
+//  FIREBASE WRAPPERS
+// ═══════════════════════════════════════════
+function fbRef(p)   { return window._FB.ref(window._FB.db, p); }
+function fbSet(p,d) { return window._FB.set(fbRef(p), d); }
+function fbGet(p)   { return window._FB.get(fbRef(p)); }
+function fbDel(p)   { return window._FB.remove(fbRef(p)); }
+function fbOn(p,cb) { var u=window._FB.onValue(fbRef(p),cb); S.listeners.push(u); return u; }
+function cleanL()   { S.listeners.forEach(function(u){try{u();}catch(e){}}); S.listeners=[]; }
+
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+var S = {
+  mode:null, roomCode:null,
+  myId: Math.random().toString(36).slice(2,10),
+  myName:'User', myEmoji:'👤',
+  myPos:null, watchId:null,
+  sosActive:false, sosWatchId:null,
+  map:null, markers:{}, users:{},
+  listeners:[], firebaseOk:false,
+  appUrl: location.href.split('?')[0]
+};
+var TRK = {
+  active:false, silentMode:false, pingCount:0,
+  intervalId:null, freqMs:30000,
+  wakeLock:null, ageTimer:null
+};
+
+function rCode(){
+  var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var out='';
+  for(var i=0;i<6;i++) out+=chars[Math.floor(Math.random()*32)];
+  return out;
+}
+
+// ═══════════════════════════════════════════
+//  FIREBASE READY
+// ═══════════════════════════════════════════
+document.addEventListener('firebase-ready', function(){
+  S.firebaseOk=true;
+  watchSOSChannel();
+});
+
+// ═══════════════════════════════════════════
+//  UI
+// ═══════════════════════════════════════════
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  document.getElementById(id).classList.add('active');
+  if(id==='map-screen' && S.map) setTimeout(function(){S.map.invalidateSize();},150);
+}
+function showToast(msg,ms){
+  ms=ms||2800;
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._t); t._t=setTimeout(function(){t.classList.remove('show');},ms);
+}
+function tAgo(ts){
+  var s=Math.round((Date.now()-ts)/1000);
+  return s<10?'now':s<60?s+'s':s<3600?Math.floor(s/60)+'m':Math.floor(s/3600)+'h';
+}
+function hav(a,b,c,d){
+  var R=6371,da=(c-a)*Math.PI/180,db=(d-b)*Math.PI/180;
+  var x=Math.sin(da/2)*Math.sin(da/2)+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(db/2)*Math.sin(db/2);
+  return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));
+}
+
+// ═══════════════════════════════════════════
+//  IDENTITY
+// ═══════════════════════════════════════════
+function onNameInput(){
+  S.myName=document.getElementById('username-input').value.trim()||'User';
+}
+function setEmoji(el){
+  S.myEmoji=el.textContent;
+  document.getElementById('name-emoji').textContent=el.textContent;
+}
+function onBannerNameInput(){
+  var v=document.getElementById('banner-name').value.trim();
+  document.getElementById('banner-name-err').style.display='none';
+  S.myName=v||'User';
+  document.getElementById('username-input').value=v;
+}
+function toggleBannerEmojiPicker(){
+  var p=document.getElementById('banner-emoji-picker');
+  p.style.display=(p.style.display==='flex')?'none':'flex';
+}
+function setBannerEmoji(el){
+  S.myEmoji=el.textContent;
+  document.getElementById('banner-emoji-prev').textContent=el.textContent;
+  document.getElementById('name-emoji').textContent=el.textContent;
+  document.getElementById('banner-emoji-picker').style.display='none';
+}
+
+// ═══════════════════════════════════════════
+//  GPS
+// ═══════════════════════════════════════════
+function gpsW(cb,ecb){
+  if(!navigator.geolocation){showToast('❌ GPS not available');return null;}
+  return navigator.geolocation.watchPosition(
+    function(p){cb(p.coords.latitude,p.coords.longitude,p.coords.accuracy);},
+    function(e){if(ecb)ecb(e);else showToast('⚠️ GPS: '+e.message);},
+    {enableHighAccuracy:true,maximumAge:4000,timeout:12000}
+  );
+}
+function gpsO(cb){
+  navigator.geolocation.getCurrentPosition(
+    function(p){cb(p.coords.latitude,p.coords.longitude);},
+    null,{enableHighAccuracy:true}
+  );
+}
+function gpsStop(id){ if(id!=null) navigator.geolocation.clearWatch(id); }
+
+// ═══════════════════════════════════════════
+//  MAP
+// ═══════════════════════════════════════════
+function initMap(lat,lng){
+  lat=lat||3.139; lng=lng||101.687;
+  if(S.map){S.map.remove();S.map=null;} S.markers={};
+  var m=L.map('map',{zoomControl:true,attributionControl:false});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(m);
+  m.setView([lat,lng],16); S.map=m;
+}
+function mkI(uid){
+  var isMe=uid===S.myId;
+  var isSOS=uid.indexOf('sos_')===0;
+  var cls=isSOS?'pm pm-sos':isMe?'pm pm-me':'pm pm-ot';
+  var em=isMe?S.myEmoji:(isSOS?'🆘':((S.users[uid]&&S.users[uid].emoji)||'👤'));
+  return L.divIcon({className:'',html:'<div class="'+cls+'">'+em+'</div>',iconSize:[42,42],iconAnchor:[21,21]});
+}
+function upsert(uid,lat,lng,pop){
+  if(!S.map)return;
+  if(S.markers[uid]){S.markers[uid].setLatLng([lat,lng]);S.markers[uid].setIcon(mkI(uid));}
+  else{
+    var mk=L.marker([lat,lng],{icon:mkI(uid)}).addTo(S.map);
+    if(pop) mk.bindPopup(pop);
+    S.markers[uid]=mk;
+  }
+}
+function rmMk(uid){ if(S.markers[uid]){S.markers[uid].remove();delete S.markers[uid];} }
+function centerMap(){
+  if(!S.map)return;
+  var pts=Object.values(S.markers).map(function(m){return m.getLatLng();});
+  if(!pts.length)return;
+  if(pts.length===1){S.map.setView(pts[0],16);return;}
+  S.map.fitBounds(L.latLngBounds(pts),{padding:[60,60]});
+}
+
+// ═══════════════════════════════════════════
+//  USER LIST
+// ═══════════════════════════════════════════
+function renderList(id){
+  var el=document.getElementById(id); if(!el)return;
+  var uids=Object.keys(S.users);
+  if(!uids.length){
+    el.innerHTML='<div class="uitem" style="justify-content:center;font-family:var(--mo);font-size:12px;color:var(--mt);padding:18px">No others here yet</div>';
+    return;
+  }
+  el.innerHTML=uids.map(function(uid){
+    var u=S.users[uid]; var isMe=uid===S.myId;
+    var gm='https://maps.google.com/?q='+u.lat+','+u.lng;
+    var waMsg=encodeURIComponent('📍 '+u.name+"'s location:\n"+gm);
+    var avC=isMe?'av-me':(u.sos?'av-sos':'av-ot');
+    var actions=isMe?'':('<button class="ib" onclick="window.open(\''+gm+'\',\'_blank\')">🗺️</button>'+
+      '<button class="ib" onclick="window.open(\'https://wa.me/?text='+waMsg+'\',\'_blank\')">💬</button>');
+    return '<div class="uitem"><div class="uav '+avC+'">'+(u.emoji||'👤')+'</div>'+
+      '<div class="ui"><div class="un">'+(isMe?'You ('+u.name+')':u.name)+(u.sos?' 🆘':'')+'</div>'+
+      '<div class="uc">'+(u.lat?u.lat.toFixed(5):'—')+', '+(u.lng?u.lng.toFixed(5):'—')+'</div></div>'+
+      '<div class="ut">'+tAgo(u.ts||Date.now())+'</div>'+
+      '<div class="ua">'+actions+'</div></div>';
+  }).join('');
+}
+function syncUI(){
+  renderList('user-list-share'); renderList('panel-ulist');
+  var leg=document.getElementById('map-legend'); if(!leg)return;
+  var h='<div class="li"><div class="ld" style="background:var(--cy)"></div><span>'+S.myEmoji+' Me</span></div>';
+  Object.entries(S.users).filter(function(e){return e[0]!==S.myId;}).forEach(function(e){
+    var uid=e[0],u=e[1];
+    h+='<div class="li"><div class="ld" style="background:'+(u.sos?'var(--rd)':'var(--pu)')+'"></div><span>'+(u.emoji||'👤')+' '+(u.name||'User')+(u.sos?' 🆘':'')+'</span></div>';
+  });
+  leg.innerHTML=h;
+}
+
+// ═══════════════════════════════════════════
+//  ROOM LISTENER
+// ═══════════════════════════════════════════
+function listenRoom(code){
+  fbOn('rooms/'+code+'/users', function(snap){
+    var data=snap.val()||{};
+    Object.keys(S.users).forEach(function(uid){if(!data[uid])rmMk(uid);});
+    S.users=data;
+    Object.entries(data).forEach(function(e){
+      var uid=e[0],u=e[1]; if(!u.lat)return;
+      upsert(uid,u.lat,u.lng,'<b>'+(u.emoji||'👤')+' '+(u.name||'User')+'</b><br>'+u.lat.toFixed(5)+', '+u.lng.toFixed(5));
+    });
+    syncUI();
+    var ot=Object.keys(data).filter(function(u){return u!==S.myId;});
+    var st=document.getElementById('share-status-text');
+    if(st) st.textContent=ot.length?(ot.length+' watching'):'Broadcasting';
+  });
+}
+
+// ═══════════════════════════════════════════
+//  SHARING
+// ═══════════════════════════════════════════
+function startSharing(){
+  if(!S.firebaseOk){showToast('⚠️ Firebase not ready yet');return;}
+  S.mode='sharer'; S.roomCode=rCode();
+  document.getElementById('display-code').textContent=S.roomCode;
+  document.getElementById('map-room-label').textContent=S.roomCode;
+  showScreen('share-screen');
+  S.watchId=gpsW(function(lat,lng,acc){
+    S.myPos={lat:lat,lng:lng,acc:acc};
+    document.getElementById('my-coords-box').style.display='flex';
+    document.getElementById('my-lat').textContent=lat.toFixed(5);
+    document.getElementById('my-lon').textContent=lng.toFixed(5);
+    document.getElementById('my-acc').textContent=Math.round(acc);
+    fbSet('rooms/'+S.roomCode+'/users/'+S.myId,
+      {lat:lat,lng:lng,acc:acc,ts:Date.now(),name:S.myName,emoji:S.myEmoji,role:'sharer'})
+    .catch(function(e){
+      if(e.code==='PERMISSION_DENIED'||(e.message&&e.message.indexOf('PERMISSION_DENIED')>=0)){
+        showFirebaseRulesHelp();
+      }
+    });
+    if(S.map) upsert(S.myId,lat,lng);
+  });
+  listenRoom(S.roomCode);
+}
+function stopSharing(){
+  gpsStop(S.watchId); S.watchId=null; cleanL();
+  if(S.roomCode) fbDel('rooms/'+S.roomCode+'/users/'+S.myId);
+  S.roomCode=null; S.mode=null; S.users={};
+  if(S.map){S.map.remove();S.map=null;}
+  showScreen('home-screen'); showToast('📴 Stopped sharing');
+}
+
+// ═══════════════════════════════════════════
+//  JOIN ROOM
+// ═══════════════════════════════════════════
+function joinRoom(silentMode){
+  silentMode=!!silentMode;
+  if(!S.firebaseOk){showToast('⚠️ Firebase not ready yet');return;}
+  var code=document.getElementById('join-code').value.trim().toUpperCase();
+  if(code.length!==6){showToast('⚠️ Enter the full 6-character code');return;}
+
+  // Validate name if banner is visible
+  var banner=document.getElementById('autojoin-banner');
+  if(banner && banner.style.display!=='none'){
+    var bn=document.getElementById('banner-name').value.trim();
+    if(!bn){
+      document.getElementById('banner-name-err').style.display='block';
+      document.getElementById('banner-name').focus();
+      return;
+    }
+    S.myName=bn;
+    document.getElementById('username-input').value=bn;
+  } else {
+    var hn=document.getElementById('username-input').value.trim();
+    S.myName=hn||('User_'+S.myId.slice(0,4));
+  }
+
+  var btn=document.getElementById('autojoin-btn');
+  var txt=document.getElementById('autojoin-btn-text');
+  if(btn) btn.disabled=true;
+  if(txt) txt.textContent='⏳ Joining…';
+  showToast('🔍 Looking up room…');
+
+  fbGet('rooms/'+code+'/users').then(function(snap){
+    if(!snap.exists()){
+      showToast('❌ Room not found — check the code');
+      if(btn){btn.disabled=false;} if(txt){txt.textContent='🚀 Join Room Now';}
+      return;
+    }
+    S.mode='tracker'; S.roomCode=code; S.users=snap.val()||{};
+    document.getElementById('map-room-label').textContent=code;
+
+    // Read admin-set frequency
+    fbGet('rooms/'+code+'/meta/freqMs').then(function(fs){
+      if(fs.exists()) TRK.freqMs=fs.val();
+    }).catch(function(){});
+
+    if(silentMode){
+      startSilentTracker();
+    } else {
+      goToMap();
+      S.watchId=gpsW(function(lat,lng,acc){
+        S.myPos={lat:lat,lng:lng,acc:acc};
+        fbSet('rooms/'+S.roomCode+'/users/'+S.myId,
+          {lat:lat,lng:lng,acc:acc,ts:Date.now(),name:S.myName,emoji:S.myEmoji,role:'tracker'});
+        if(S.map) upsert(S.myId,lat,lng);
+      });
+      listenRoom(code);
+    }
+  }).catch(function(e){
+    console.error('joinRoom error:',e.code,e.message);
+    if(btn){btn.disabled=false;} if(txt){txt.textContent='🚀 Join Room Now';}
+    if(e.code==='PERMISSION_DENIED'||(e.message&&e.message.indexOf('PERMISSION_DENIED')>=0)){
+      showFirebaseRulesHelp();
+    } else {
+      showToast('❌ '+(e.message||'Database error'));
+    }
+  });
+}
+
+function goToMap(){
+  showScreen('map-screen');
+  setTimeout(function(){
+    var p=S.myPos||{lat:3.139,lng:101.687};
+    initMap(p.lat,p.lng);
+    Object.entries(S.users).forEach(function(e){
+      var uid=e[0],u=e[1]; if(!u.lat)return;
+      upsert(uid,u.lat,u.lng,'<b>'+(u.emoji||'👤')+' '+(u.name||'User')+'</b><br>'+u.lat.toFixed(5)+', '+u.lng.toFixed(5));
+    });
+    if(S.myPos) upsert(S.myId,S.myPos.lat,S.myPos.lng);
+    syncUI(); centerMap();
+  },120);
+}
+function leaveMap(){
+  if(S.mode==='sharer'){showScreen('share-screen');return;}
+  cleanL(); gpsStop(S.watchId); S.watchId=null;
+  if(S.roomCode) fbDel('rooms/'+S.roomCode+'/users/'+S.myId);
+  S.roomCode=null; S.mode=null; S.users={};
+  if(S.map){S.map.remove();S.map=null;}
+  showScreen('home-screen');
+}
+function openPanel(){ renderList('panel-ulist');document.getElementById('panel').classList.add('open');document.getElementById('pov').classList.add('open'); }
+function closePanel(){ document.getElementById('panel').classList.remove('open');document.getElementById('pov').classList.remove('open'); }
+
+// ═══════════════════════════════════════════
+//  WHATSAPP & SHARE
+// ═══════════════════════════════════════════
+function shareWA(){
+  if(!S.roomCode)return;
+  var link=S.appUrl+'?room='+S.roomCode;
+  var msg='📍 *PingMe Live Location*\n\nTracking me in real-time!\n\n🔑 Room Code: *'+S.roomCode+'*\n🔗 Join: '+link+'\n\nTap the link or enter the code in PingMe.';
+  var w=window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+  if(!w) navigator.clipboard.writeText(link).then(function(){showToast('✅ Link copied!');}).catch(function(){showToast(link);});
+}
+function shareGMaps(){
+  var p=S.myPos; if(!p){showToast('⚠️ GPS not ready yet');return;}
+  var gm='https://maps.google.com/?q='+p.lat+','+p.lng;
+  var msg='📍 *'+S.myName+"'s Location*\n\n"+gm+'\n\nCoords: '+p.lat.toFixed(6)+', '+p.lng.toFixed(6);
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+function copyCode(){
+  if(!S.roomCode)return;
+  navigator.clipboard.writeText(S.roomCode).then(function(){showToast('✅ Code copied!');}).catch(function(){showToast('Code: '+S.roomCode);});
+}
+function shareLink(){
+  if(!S.roomCode)return;
+  var link=S.appUrl+'?room='+S.roomCode;
+  navigator.clipboard.writeText(link).then(function(){showToast('✅ Link copied!');}).catch(function(){showToast(link);});
+}
+function copyGPS(){
+  var p=S.myPos; if(!p){showToast('⚠️ GPS not ready');return;}
+  navigator.clipboard.writeText(p.lat.toFixed(6)+', '+p.lng.toFixed(6)).then(function(){showToast('✅ Coordinates copied!');}).catch(function(){});
+}
+
+// ═══════════════════════════════════════════
+//  SOS
+// ═══════════════════════════════════════════
+function activateSOS(){
+  if(!S.firebaseOk){showToast('⚠️ Firebase not ready');return;}
+  if(!confirm('🆘 ACTIVATE SOS?\n\nBroadcasts your location to ALL nearby PingMe users.\n\nGenuine emergencies only.')) return;
+  S.sosActive=true;
+  document.querySelectorAll('.sos-btn').forEach(function(b){b.classList.add('active-sos');});
+  showScreen('sos-screen');
+  gpsO(function(lat,lng){
+    S.myPos={lat:lat,lng:lng};
+    document.getElementById('sos-lat').textContent=lat.toFixed(6);
+    document.getElementById('sos-lon').textContent=lng.toFixed(6);
+    fbSet('sos/'+S.myId,{lat:lat,lng:lng,ts:Date.now(),name:S.myName,emoji:S.myEmoji,active:true});
+    showToast('🆘 SOS broadcast active',5000);
+  });
+  S.sosWatchId=gpsW(function(lat,lng,acc){
+    S.myPos={lat:lat,lng:lng,acc:acc};
+    document.getElementById('sos-lat').textContent=lat.toFixed(6);
+    document.getElementById('sos-lon').textContent=lng.toFixed(6);
+    fbSet('sos/'+S.myId,{lat:lat,lng:lng,acc:acc,ts:Date.now(),name:S.myName,emoji:S.myEmoji,active:true});
+  });
+  fbOn('sos',function(snap){
+    var sos=snap.val()||{},mp=S.myPos;
+    var resp=Object.entries(sos).filter(function(e){
+      var uid=e[0],u=e[1];
+      return uid!==S.myId&&!u.active&&u.lat&&mp&&hav(mp.lat,mp.lng,u.lat,u.lng)<10;
+    });
+    document.getElementById('sos-nearby-count').textContent=resp.length?'✅ '+resp.length+' PingMe user(s) nearby alerted':'🔍 Searching for nearby PingMe users…';
+  });
+}
+function deactivateSOS(){
+  if(!confirm('Confirm you are SAFE and want to cancel SOS.')) return;
+  S.sosActive=false; gpsStop(S.sosWatchId); S.sosWatchId=null;
+  fbDel('sos/'+S.myId);
+  document.querySelectorAll('.sos-btn').forEach(function(b){b.classList.remove('active-sos');});
+  cleanL(); showScreen('home-screen'); showToast('✅ SOS cancelled. Stay safe!');
+}
+function shareSOSWA(){
+  var p=S.myPos||{lat:0,lng:0};
+  var gm='https://maps.google.com/?q='+p.lat+','+p.lng;
+  var t=new Date().toLocaleTimeString();
+  var msg='🆘 *EMERGENCY SOS*\n\n*'+S.myName+'* needs immediate help!\n\n📍 Live location:\n'+gm+'\n\n📌 '+p.lat.toFixed(6)+', '+p.lng.toFixed(6)+'\n⏰ '+t+'\n\n_Please call 999 or go to this location._';
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+function shareSOSMap(){
+  var p=S.myPos; if(!p){showToast('⚠️ GPS not ready yet');return;}
+  var gm='https://maps.google.com/?q='+p.lat+','+p.lng;
+  var msg='🆘 *SOS EMERGENCY*\n\n*'+S.myName+'* needs immediate help!\n\n📍 Location:\n'+gm+'\n\n📌 '+p.lat.toFixed(6)+', '+p.lng.toFixed(6)+'\n⏰ '+new Date().toLocaleTimeString();
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+function callEmergency(){
+  var coords=S.myPos?('Coords: '+S.myPos.lat.toFixed(5)+', '+S.myPos.lng.toFixed(5)):'';
+  if(confirm('Call 999?\n\n'+coords)) window.location.href='tel:999';
+}
+
+// ═══════════════════════════════════════════
+//  SOS WATCH CHANNEL
+// ═══════════════════════════════════════════
+function watchSOSChannel(){
+  window._FB.onValue(fbRef('sos'),function(snap){
+    var sos=snap.val()||{};
+    Object.entries(sos).forEach(function(e){
+      var uid=e[0],u=e[1];
+      if(!u.active||uid===S.myId||!S.myPos||!u.lat)return;
+      var km=hav(S.myPos.lat,S.myPos.lng,u.lat,u.lng);
+      if(km<50){
+        var dist=km<1?Math.round(km*1000)+'m':km.toFixed(1)+'km';
+        showToast('🆘 SOS! '+(u.name||'Someone')+' needs help '+dist+' away!',8000);
+        if(S.map) upsert('sos_'+uid,u.lat,u.lng,'<b>🆘 SOS: '+u.name+'</b>');
+      }
+    });
+  });
+}
+
+// ═══════════════════════════════════════════
+//  ADMIN — PING FREQUENCY
+// ═══════════════════════════════════════════
+function setFreq(ms){
+  TRK.freqMs=ms;
+  document.querySelectorAll('.freq-btn').forEach(function(b){
+    b.classList.toggle('sel', parseInt(b.getAttribute('data-ms'))===ms);
+  });
+  var labels={10000:'10 seconds',30000:'30 seconds',60000:'1 minute',120000:'2 minutes',300000:'5 minutes'};
+  document.getElementById('freq-status').textContent='Current: '+(labels[ms]||ms+'ms');
+  if(S.roomCode) fbSet('rooms/'+S.roomCode+'/meta/freqMs',ms);
+  if(TRK.active && TRK.intervalId){
+    clearInterval(TRK.intervalId);
+    TRK.intervalId=setInterval(doPing,TRK.freqMs);
+  }
+}
+
+// ═══════════════════════════════════════════
+//  SILENT TRACKER ENGINE
+// ═══════════════════════════════════════════
+function doPing(){
+  if(!TRK.active||!S.roomCode)return;
+  navigator.geolocation.getCurrentPosition(
+    function(pos){
+      var lat=pos.coords.latitude, lng=pos.coords.longitude, acc=pos.coords.accuracy;
+      S.myPos={lat:lat,lng:lng,acc:acc};
+      TRK.pingCount++;
+      fbSet('rooms/'+S.roomCode+'/users/'+S.myId,
+        {lat:lat,lng:lng,acc:acc,ts:Date.now(),name:S.myName,emoji:S.myEmoji,role:'tracker',silent:true})
+      .catch(function(e){console.warn('Ping write failed:',e.message);});
+      // Update UI
+      var ge=function(id){return document.getElementById(id);};
+      if(ge('trk-lat')) ge('trk-lat').textContent=lat.toFixed(6);
+      if(ge('trk-lon')) ge('trk-lon').textContent=lng.toFixed(6);
+      if(ge('trk-pings')) ge('trk-pings').textContent=TRK.pingCount;
+      if(ge('trk-acc-disp')) ge('trk-acc-disp').textContent=Math.round(acc)+'m';
+      if(ge('trk-last')) ge('trk-last').textContent='just now';
+      if(ge('trk-title')) ge('trk-title').textContent='🟢 Tracking Active';
+      if(ge('trk-icon')) ge('trk-icon').textContent=S.myEmoji||'📡';
+      // Age counter
+      if(TRK.ageTimer) clearInterval(TRK.ageTimer);
+      var secs=0;
+      TRK.ageTimer=setInterval(function(){
+        secs++;
+        var el=document.getElementById('trk-last');
+        if(el) el.textContent=secs<60?secs+'s ago':Math.floor(secs/60)+'m ago';
+      },1000);
+    },
+    function(err){console.warn('Ping GPS error:',err.message);},
+    {enableHighAccuracy:true,timeout:8000,maximumAge:10000}
+  );
+}
+
+function listenFreq(code){
+  fbOn('rooms/'+code+'/meta/freqMs',function(snap){
+    var ms=snap.val();
+    if(!ms||ms===TRK.freqMs)return;
+    TRK.freqMs=ms;
+    var labels={10000:'10s',30000:'30s',60000:'1min',120000:'2min',300000:'5min'};
+    var el=document.getElementById('trk-freq-label');
+    if(el) el.textContent='📶 Ping every '+(labels[ms]||ms+'ms')+' (set by admin)';
+    var el2=document.getElementById('trk-interval-disp');
+    if(el2) el2.textContent=labels[ms]||ms+'ms';
+    if(TRK.active&&TRK.intervalId){
+      clearInterval(TRK.intervalId);
+      TRK.intervalId=setInterval(doPing,TRK.freqMs);
+    }
+  });
+}
+
+function requestWakeLock(){
+  if(!('wakeLock' in navigator))return;
+  navigator.wakeLock.request('screen').then(function(wl){
+    TRK.wakeLock=wl;
+    wl.addEventListener('release',function(){
+      if(TRK.active) setTimeout(requestWakeLock,500);
+    });
+  }).catch(function(e){console.warn('WakeLock:',e.message);});
+}
+function releaseWakeLock(){
+  if(TRK.wakeLock){try{TRK.wakeLock.release();}catch(e){} TRK.wakeLock=null;}
+}
+
+document.addEventListener('visibilitychange',function(){
+  if(!TRK.active)return;
+  if(document.visibilityState==='visible'){
+    if(!TRK.wakeLock) requestWakeLock();
+    doPing();
+  }
+});
+
+function startSilentTracker(){
+  TRK.active=true; TRK.silentMode=true; TRK.pingCount=0;
+  showScreen('tracker-screen');
+  var labels={10000:'10s',30000:'30s',60000:'1min',120000:'2min',300000:'5min'};
+  var lbl=labels[TRK.freqMs]||TRK.freqMs+'ms';
+  var sub=document.getElementById('trk-sub');
+  if(sub) sub.textContent='Room: '+S.roomCode+' · '+S.myName;
+  var freq=document.getElementById('trk-freq-label');
+  if(freq) freq.textContent='📶 Ping every '+lbl;
+  var intDisp=document.getElementById('trk-interval-disp');
+  if(intDisp) intDisp.textContent=lbl;
+  requestWakeLock();
+  doPing();
+  TRK.intervalId=setInterval(doPing,TRK.freqMs);
+  listenFreq(S.roomCode);
+  showToast('📡 Silent tracker active — screen kept on',4000);
+}
+
+function stopSilentTracker(){
+  TRK.active=false; TRK.silentMode=false;
+  clearInterval(TRK.intervalId); TRK.intervalId=null;
+  if(TRK.ageTimer){clearInterval(TRK.ageTimer); TRK.ageTimer=null;}
+  releaseWakeLock();
+  gpsStop(S.watchId); S.watchId=null;
+  cleanL();
+  if(S.roomCode) fbDel('rooms/'+S.roomCode+'/users/'+S.myId);
+  S.roomCode=null; S.mode=null; S.users={};
+  showScreen('home-screen');
+  showToast('📴 Tracker stopped');
+}
+
+// ═══════════════════════════════════════════
+//  FIREBASE RULES MODAL
+// ═══════════════════════════════════════════
+function showFirebaseRulesHelp(){
+  document.getElementById('rules-modal').style.display='flex';
+  showToast('🔒 Permission denied — see fix guide',3000);
+}
+function closeRulesModal(){
+  document.getElementById('rules-modal').style.display='none';
+}
+function copyRules(){
+  var rules='{\n  "rules": {\n    ".read": true,\n    ".write": true\n  }\n}';
+  navigator.clipboard.writeText(rules)
+    .then(function(){showToast('✅ Rules copied — paste in Firebase Console');})
+    .catch(function(){showToast('Copy: { ".read": true, ".write": true }');});
+}
+
+// ═══════════════════════════════════════════
+//  URL PARAM AUTO-JOIN (?room=XXXXXX)
+// ═══════════════════════════════════════════
+(function(){
+  var room=new URLSearchParams(location.search).get('room');
+  if(!room)return;
+  var code=room.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6);
+  if(code.length!==6)return;
+  document.getElementById('join-code').value=code;
+  var banner=document.getElementById('autojoin-banner');
+  var bannerCode=document.getElementById('banner-code');
+  if(banner) banner.style.display='block';
+  if(bannerCode) bannerCode.textContent=code;
+  // Pre-fill name if already set on home screen
+  var homeNameEl=document.getElementById('username-input');
+  var bannerNameEl=document.getElementById('banner-name');
+  if(homeNameEl&&bannerNameEl&&homeNameEl.value.trim()){
+    bannerNameEl.value=homeNameEl.value.trim();
+    S.myName=homeNameEl.value.trim();
+  }
+  setTimeout(function(){if(bannerNameEl)bannerNameEl.focus();},400);
+})();
+
+// ═══════════════════════════════════════════
+//  CLEANUP
+// ═══════════════════════════════════════════
+window.addEventListener('beforeunload',function(){
+  gpsStop(S.watchId); gpsStop(S.sosWatchId);
+  if(TRK.intervalId) clearInterval(TRK.intervalId);
+  releaseWakeLock();
+  if(S.roomCode) fbDel('rooms/'+S.roomCode+'/users/'+S.myId);
+  if(S.sosActive) fbDel('sos/'+S.myId);
+});
+</script>
 </body>
 </html>
