@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#0a0f1e" />
+  <meta name="theme-color" content="#060a14" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -11,19 +11,13 @@
   <title>PingMe — Live Location</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-  <!-- Firebase SDKs -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getDatabase, ref, set, onValue, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-    // =====================================================
-    // FIREBASE CONFIG — replace with YOUR config from
-    // https://console.firebase.google.com  (it's FREE)
-    // =====================================================
+    import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    // PASTE YOUR FREE FIREBASE CONFIG HERE — get it at firebase.google.com
 const firebaseConfig = {
   apiKey: "AIzaSyDPMQH8FzkjZMPTFR09cuMGYi5k9NmuIwQ",
   authDomain: "ping-me-1c3d9.firebaseapp.com",
@@ -34,762 +28,439 @@ const firebaseConfig = {
   appId: "1:398925457761:web:5a776122569db9339dbd20",
   measurementId: "G-PW1KGELMGL"
 };
-
-    const app = initializeApp(firebaseConfig);
-    const db  = getDatabase(app);
-    window._db  = db;
-    window._ref = ref;
-    window._set = set;
-    window._onValue = onValue;
-    window._remove  = remove;
-    window._serverTimestamp = serverTimestamp;
-    window._firebaseReady = true;
-    document.dispatchEvent(new Event("firebase-ready"));
+    try {
+      const app = initializeApp(firebaseConfig);
+      const db = getDatabase(app);
+      window._db=db; window._ref=ref; window._set=set; window._onValue=onValue; window._remove=remove;
+      window._firebaseReady=true;
+      document.dispatchEvent(new Event("firebase-ready"));
+    } catch(e){ console.warn('Firebase error:',e); }
   </script>
-
-  <style>
-    /* ── RESET & BASE ── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg:         #080c18;
-      --surface:    #0f1628;
-      --surface2:   #161e38;
-      --border:     #1e2d55;
-      --accent:     #00d4ff;
-      --accent2:    #7c5cfc;
-      --warn:       #ff6b35;
-      --green:      #00e676;
-      --text:       #e8eaf6;
-      --muted:      #5c6bc0;
-      --font-head:  'Syne', sans-serif;
-      --font-mono:  'Space Mono', monospace;
-    }
-    html, body {
-      height: 100%; width: 100%;
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font-head);
-      overflow: hidden;
-    }
-
-    /* ── SCREENS ── */
-    .screen {
-      position: fixed; inset: 0;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      padding: 24px;
-      opacity: 0; pointer-events: none;
-      transition: opacity .35s ease;
-      z-index: 1;
-    }
-    .screen.active { opacity: 1; pointer-events: all; }
-
-    /* ── BACKGROUND GRID ── */
-    body::before {
-      content: '';
-      position: fixed; inset: 0;
-      background-image:
-        linear-gradient(rgba(0,212,255,.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,212,255,.04) 1px, transparent 1px);
-      background-size: 40px 40px;
-      pointer-events: none;
-      z-index: 0;
-    }
-    body::after {
-      content: '';
-      position: fixed; inset: 0;
-      background: radial-gradient(ellipse at 50% 0%, rgba(124,92,252,.12) 0%, transparent 65%);
-      pointer-events: none; z-index: 0;
-    }
-
-    /* ── HOME SCREEN ── */
-    #home-screen { gap: 32px; }
-
-    .logo-wrap {
-      display: flex; flex-direction: column; align-items: center; gap: 8px;
-      animation: fadeUp .6s ease both;
-    }
-    .logo-icon {
-      width: 72px; height: 72px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border-radius: 22px;
-      display: grid; place-items: center;
-      font-size: 32px;
-      box-shadow: 0 0 40px rgba(0,212,255,.3), 0 0 80px rgba(124,92,252,.15);
-      position: relative;
-    }
-    .logo-icon::after {
-      content: '';
-      position: absolute; inset: -1px;
-      border-radius: 23px;
-      background: linear-gradient(135deg, rgba(0,212,255,.4), rgba(124,92,252,.4));
-      z-index: -1;
-    }
-    .logo-title {
-      font-size: 36px; font-weight: 800; letter-spacing: -1px;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .logo-sub {
-      font-size: 13px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase;
-      font-family: var(--font-mono);
-    }
-
-    .btn-group {
-      display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 340px;
-      animation: fadeUp .6s .15s ease both;
-    }
-    .btn {
-      width: 100%; padding: 18px 24px;
-      border: none; border-radius: 14px;
-      font-family: var(--font-head); font-size: 15px; font-weight: 600;
-      cursor: pointer; transition: all .2s ease;
-      position: relative; overflow: hidden;
-      letter-spacing: .5px;
-    }
-    .btn::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: rgba(255,255,255,.08);
-      opacity: 0; transition: opacity .2s;
-    }
-    .btn:hover::before { opacity: 1; }
-    .btn:active { transform: scale(.97); }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent), #0090c4);
-      color: #000; box-shadow: 0 4px 30px rgba(0,212,255,.3);
-    }
-    .btn-secondary {
-      background: var(--surface2);
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-    .btn-danger {
-      background: linear-gradient(135deg, var(--warn), #c94b1b);
-      color: #fff; box-shadow: 0 4px 20px rgba(255,107,53,.3);
-    }
-    .btn-success {
-      background: linear-gradient(135deg, var(--green), #00a152);
-      color: #000; box-shadow: 0 4px 20px rgba(0,230,118,.3);
-    }
-    .btn-sm {
-      padding: 12px 20px; font-size: 13px;
-    }
-
-    .divider {
-      display: flex; align-items: center; gap: 12px;
-      color: var(--muted); font-size: 12px; font-family: var(--font-mono);
-      width: 100%; max-width: 340px;
-    }
-    .divider::before, .divider::after {
-      content: ''; flex: 1; height: 1px; background: var(--border);
-    }
-
-    /* ── CARD ── */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 24px;
-      width: 100%; max-width: 340px;
-      animation: fadeUp .35s ease both;
-    }
-    .card-title {
-      font-size: 14px; font-weight: 600; color: var(--muted);
-      text-transform: uppercase; letter-spacing: 1.5px;
-      margin-bottom: 16px; font-family: var(--font-mono);
-    }
-
-    /* ── INPUT ── */
-    .input-wrap { display: flex; flex-direction: column; gap: 10px; }
-    input[type="text"] {
-      width: 100%; padding: 14px 16px;
-      background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 10px; color: var(--text);
-      font-family: var(--font-mono); font-size: 20px;
-      text-align: center; letter-spacing: 6px; text-transform: uppercase;
-      transition: border-color .2s;
-      outline: none;
-    }
-    input[type="text"]:focus { border-color: var(--accent); }
-    input[type="text"]::placeholder { color: var(--muted); letter-spacing: 3px; font-size: 14px; }
-
-    /* ── STATUS PILL ── */
-    .status-pill {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 6px 14px; border-radius: 99px;
-      font-size: 12px; font-family: var(--font-mono);
-      background: var(--surface2); border: 1px solid var(--border);
-    }
-    .dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: var(--muted);
-    }
-    .dot.green { background: var(--green); box-shadow: 0 0 8px var(--green); animation: pulse 2s infinite; }
-    .dot.blue  { background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulse 2s infinite; }
-    .dot.warn  { background: var(--warn); box-shadow: 0 0 8px var(--warn); }
-
-    /* ── SHARE SCREEN ── */
-    #share-screen { gap: 20px; }
-    .room-code-display {
-      font-size: 42px; font-weight: 800; letter-spacing: 12px;
-      font-family: var(--font-mono);
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      text-align: center; padding: 8px 0;
-    }
-    .share-hint {
-      font-size: 12px; color: var(--muted); font-family: var(--font-mono);
-      text-align: center; line-height: 1.7;
-    }
-    .coords-row {
-      display: flex; gap: 8px; font-family: var(--font-mono);
-      font-size: 11px; color: var(--accent);
-    }
-    .coords-row span { opacity: .6; color: var(--muted); }
-
-    /* ── MAP SCREEN ── */
-    #map-screen {
-      padding: 0; justify-content: flex-start; align-items: stretch;
-    }
-    #map { flex: 1; z-index: 1; }
-    .map-header {
-      position: absolute; top: 0; left: 0; right: 0;
-      z-index: 999;
-      padding: 12px 16px;
-      background: linear-gradient(var(--bg), transparent);
-      display: flex; align-items: center; gap: 12px;
-    }
-    .map-header .room-tag {
-      font-family: var(--font-mono); font-size: 12px;
-      background: rgba(8,12,24,.85); border: 1px solid var(--border);
-      padding: 6px 12px; border-radius: 8px; letter-spacing: 2px;
-      color: var(--accent);
-    }
-    .map-footer {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      z-index: 999;
-      padding: 16px;
-      background: linear-gradient(transparent, var(--bg));
-      display: flex; gap: 10px; justify-content: center;
-    }
-
-    /* ── LEGEND ── */
-    .legend {
-      display: flex; gap: 16px; align-items: center;
-      font-size: 11px; font-family: var(--font-mono);
-      color: var(--muted);
-      background: rgba(8,12,24,.85); border: 1px solid var(--border);
-      padding: 8px 14px; border-radius: 10px;
-    }
-    .legend-item { display: flex; align-items: center; gap: 6px; }
-    .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
-
-    /* ── TOAST ── */
-    #toast {
-      position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%) translateY(20px);
-      background: var(--surface); border: 1px solid var(--border);
-      color: var(--text); padding: 12px 22px; border-radius: 12px;
-      font-size: 13px; font-family: var(--font-mono);
-      opacity: 0; transition: all .3s ease; z-index: 9999;
-      white-space: nowrap; pointer-events: none;
-    }
-    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    /* ── BACK BTN ── */
-    .back-btn {
-      background: rgba(8,12,24,.85); border: 1px solid var(--border);
-      color: var(--text); padding: 8px 14px; border-radius: 8px;
-      font-family: var(--font-mono); font-size: 12px; cursor: pointer;
-      transition: all .2s;
-    }
-    .back-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-    /* ── LOADING ── */
-    .loader {
-      width: 20px; height: 20px;
-      border: 2px solid var(--border); border-top-color: var(--accent);
-      border-radius: 50%; animation: spin .7s linear infinite;
-      display: inline-block;
-    }
-    .loading-row { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); font-family: var(--font-mono); }
-
-    /* ── SETUP NOTICE ── */
-    .setup-notice {
-      background: rgba(255,107,53,.08);
-      border: 1px solid rgba(255,107,53,.3);
-      border-radius: 12px; padding: 16px;
-      font-size: 12px; font-family: var(--font-mono);
-      color: var(--warn); line-height: 1.8;
-      width: 100%; max-width: 340px;
-      animation: fadeUp .6s .3s ease both;
-    }
-    .setup-notice a { color: var(--accent); }
-    .setup-notice strong { color: var(--text); }
-
-    /* ── ANIMATIONS ── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(18px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: .4; }
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* ── LEAFLET CUSTOMIZATION ── */
-    .leaflet-container { background: #0a0f1e !important; }
-    .leaflet-tile { filter: brightness(.7) saturate(.6) hue-rotate(200deg); }
-    .leaflet-control-zoom a {
-      background: var(--surface) !important;
-      color: var(--text) !important;
-      border-color: var(--border) !important;
-    }
-
-    /* ── CUSTOM MARKERS ── */
-    .marker-me, .marker-other {
-      width: 40px; height: 40px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; border: 3px solid;
-      box-shadow: 0 2px 20px rgba(0,0,0,.5);
-      animation: markerPop .4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    .marker-me    { background: rgba(0,212,255,.2); border-color: var(--accent); }
-    .marker-other { background: rgba(124,92,252,.2); border-color: var(--accent2); }
-    @keyframes markerPop {
-      from { transform: scale(0); }
-      to   { transform: scale(1); }
-    }
-
-    /* ── FIREBASE NOT CONFIGURED ── */
-    .demo-badge {
-      background: rgba(255,107,53,.15); border: 1px solid rgba(255,107,53,.4);
-      color: var(--warn); padding: 4px 10px; border-radius: 6px;
-      font-size: 10px; font-family: var(--font-mono); letter-spacing: 1px;
-    }
-  </style>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#060a14;--s1:#0b1120;--s2:#111927;--s3:#182236;
+  --b1:#1a2d50;--b2:#243d6a;
+  --cy:#00e5ff;--pu:#8b5cf6;--gn:#10b981;--rd:#ef4444;--or:#f97316;--wa:#25d366;
+  --tx:#e2e8f6;--mt:#4a6080;
+  --mo:'DM Mono',monospace;--hd:'Syne',sans-serif;
+}
+html,body{height:100%;width:100%;background:var(--bg);color:var(--tx);font-family:var(--hd);overflow:hidden;-webkit-tap-highlight-color:transparent;}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,229,255,.013) 2px,rgba(0,229,255,.013) 4px),
+  linear-gradient(135deg,rgba(139,92,246,.06) 0%,transparent 50%,rgba(0,229,255,.04) 100%);}
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;opacity:0;pointer-events:none;transition:opacity .3s;z-index:1;overflow-y:auto;overflow-x:hidden;}
+.screen.active{opacity:1;pointer-events:all;}
+.si{display:flex;flex-direction:column;align-items:center;gap:13px;width:100%;max-width:420px;padding:44px 18px 110px;min-height:100%;}
+.brand{display:flex;align-items:center;gap:13px;animation:slideDown .5s ease both;width:100%;}
+.bi{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--cy),var(--pu));display:grid;place-items:center;font-size:22px;flex-shrink:0;box-shadow:0 0 26px rgba(0,229,255,.22),0 0 52px rgba(139,92,246,.1);}
+.bi.red{background:linear-gradient(135deg,var(--rd),#991b1b);}
+.bn{font-size:25px;font-weight:800;letter-spacing:-1px;line-height:1;background:linear-gradient(90deg,var(--cy),var(--pu));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.bn.red{background:linear-gradient(90deg,var(--rd),var(--or));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.bt{font-family:var(--mo);font-size:10px;color:var(--mt);letter-spacing:2px;text-transform:uppercase;margin-top:1px;}
+.card{width:100%;background:var(--s1);border:1px solid var(--b1);border-radius:15px;overflow:hidden;animation:fadeUp .4s ease both;}
+.ch{padding:12px 16px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;}
+.cl{font-family:var(--mo);font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--mt);}
+.cb{padding:15px;}
+.btn{width:100%;padding:14px 17px;border:none;border-radius:11px;font-family:var(--hd);font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;letter-spacing:.3px;display:flex;align-items:center;justify-content:center;gap:7px;}
+.btn:active{transform:scale(.97);}
+.bc{background:linear-gradient(135deg,var(--cy),#0099bb);color:#000;box-shadow:0 4px 20px rgba(0,229,255,.22);}
+.bp{background:linear-gradient(135deg,var(--pu),#6d28d9);color:#fff;box-shadow:0 4px 20px rgba(139,92,246,.22);}
+.bg{background:linear-gradient(135deg,var(--gn),#059669);color:#fff;box-shadow:0 4px 18px rgba(16,185,129,.22);}
+.bw{background:linear-gradient(135deg,var(--wa),#128c7e);color:#fff;box-shadow:0 4px 16px rgba(37,211,102,.22);}
+.br{background:linear-gradient(135deg,var(--rd),#b91c1c);color:#fff;box-shadow:0 4px 16px rgba(239,68,68,.28);}
+.bgh{background:var(--s2);color:var(--tx);border:1px solid var(--b1);}
+.bsm{padding:9px 14px;font-size:12px;border-radius:9px;}
+.brow{display:flex;gap:7px;width:100%;}.brow .btn{flex:1;}
+input[type=text]{width:100%;padding:12px 14px;background:var(--s2);border:1px solid var(--b1);border-radius:9px;color:var(--tx);font-family:var(--mo);font-size:18px;text-align:center;letter-spacing:5px;text-transform:uppercase;transition:border-color .2s;outline:none;}
+input[type=text]:focus{border-color:var(--cy);}
+input.ni{font-size:14px;letter-spacing:1px;text-align:left;text-transform:none;}
+input::placeholder{color:var(--mt);font-size:12px;letter-spacing:2px;}
+input.ni::placeholder{letter-spacing:.5px;}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;font-family:var(--mo);font-size:11px;background:var(--s2);border:1px solid var(--b1);}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--mt);flex-shrink:0;}
+.dot.live{background:var(--gn);box-shadow:0 0 6px var(--gn);animation:blink 2s infinite;}
+.dot.share{background:var(--cy);box-shadow:0 0 6px var(--cy);animation:blink 2s infinite;}
+.dot.sos{background:var(--rd);box-shadow:0 0 8px var(--rd);animation:blink .7s infinite;}
+.code-big{font-family:var(--mo);font-size:36px;font-weight:500;letter-spacing:11px;text-align:center;padding:5px 0;background:linear-gradient(90deg,var(--cy),var(--pu));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.code-hint{font-family:var(--mo);font-size:11px;color:var(--mt);text-align:center;line-height:1.8;}
+.ulist{display:flex;flex-direction:column;}
+.uitem{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--b1);}
+.uitem:last-child{border-bottom:none;}
+.uav{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:15px;flex-shrink:0;}
+.av-me{background:rgba(0,229,255,.12);border:1.5px solid var(--cy);}
+.av-ot{background:rgba(139,92,246,.12);border:1.5px solid var(--pu);}
+.av-sos{background:rgba(239,68,68,.15);border:1.5px solid var(--rd);}
+.ui{flex:1;min-width:0;}
+.un{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.uc{font-family:var(--mo);font-size:10px;color:var(--mt);margin-top:2px;}
+.ut{font-family:var(--mo);font-size:10px;color:var(--mt);white-space:nowrap;}
+.ua{display:flex;gap:4px;}
+.ib{width:28px;height:28px;border-radius:6px;display:grid;place-items:center;font-size:13px;cursor:pointer;transition:all .15s;border:none;background:var(--s3);}
+.ib:active{transform:scale(.92);}
+.sos-wrap{position:relative;display:flex;align-items:center;justify-content:center;padding:8px 0;}
+.sos-ring{position:absolute;width:94px;height:94px;border-radius:50%;border:2px solid rgba(239,68,68,.3);animation:sosRing 2s ease-out infinite;}
+.sos-ring:nth-child(2){animation-delay:.7s;}.sos-ring:nth-child(3){animation-delay:1.4s;}
+.sos-btn{position:relative;z-index:1;width:94px;height:94px;border-radius:50%;background:radial-gradient(circle,#e53e3e,#991b1b);border:none;color:#fff;font-family:var(--hd);font-weight:800;font-size:11px;letter-spacing:.5px;cursor:pointer;box-shadow:0 0 26px rgba(239,68,68,.5),0 0 52px rgba(239,68,68,.2);transition:all .15s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;outline:none;}
+.sos-btn:active{transform:scale(.94);}
+.sos-btn.active-sos{animation:sosG 1s infinite alternate;}
+@keyframes sosG{from{box-shadow:0 0 26px rgba(239,68,68,.5);}to{box-shadow:0 0 58px rgba(239,68,68,.9),0 0 100px rgba(239,68,68,.3);}}
+@keyframes sosRing{0%{transform:scale(.8);opacity:.8;}100%{transform:scale(2.1);opacity:0;}}
+.cbox{display:flex;gap:5px;align-items:center;font-family:var(--mo);font-size:11px;color:var(--cy);background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.15);padding:7px 11px;border-radius:8px;flex-wrap:wrap;}
+.cbox span{color:var(--mt);}
+.alert{width:100%;padding:12px 14px;border-radius:11px;font-size:12px;font-family:var(--mo);line-height:1.7;display:flex;gap:8px;align-items:flex-start;}
+.a-warn{background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.3);color:var(--or);}
+.a-red{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);color:var(--rd);}
+.ai{font-size:14px;flex-shrink:0;margin-top:1px;}
+.stitle{font-family:var(--mo);font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--mt);width:100%;padding:0 2px;}
+.divider{display:flex;align-items:center;gap:10px;color:var(--mt);font-size:11px;font-family:var(--mo);width:100%;letter-spacing:1px;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--b1);}
+.nrow{display:flex;align-items:center;gap:9px;}
+.nprev{width:34px;height:34px;border-radius:50%;background:rgba(0,229,255,.12);border:1.5px solid var(--cy);display:grid;place-items:center;font-size:17px;flex-shrink:0;}
+#map-screen{padding:0;justify-content:flex-start;align-items:stretch;overflow:hidden;}
+#map{position:absolute;inset:0;z-index:1;}
+.map-top{position:absolute;top:0;left:0;right:0;z-index:900;padding:11px 13px;background:linear-gradient(to bottom,rgba(6,10,20,.95) 55%,transparent);display:flex;align-items:center;gap:8px;}
+.mbk{background:rgba(11,17,32,.9);border:1px solid var(--b1);color:var(--tx);padding:6px 11px;border-radius:8px;font-family:var(--mo);font-size:11px;cursor:pointer;transition:all .15s;}
+.mbk:hover{border-color:var(--cy);color:var(--cy);}
+.mrb{font-family:var(--mo);font-size:11px;letter-spacing:2px;background:rgba(11,17,32,.9);border:1px solid var(--b1);padding:6px 11px;border-radius:8px;color:var(--cy);}
+.map-bot{position:absolute;bottom:0;left:0;right:0;z-index:900;padding:11px 12px 22px;background:linear-gradient(to top,rgba(6,10,20,.95) 55%,transparent);display:flex;flex-direction:column;gap:8px;}
+.mleg{display:flex;gap:11px;flex-wrap:wrap;background:rgba(11,17,32,.85);border:1px solid var(--b1);padding:7px 11px;border-radius:9px;align-self:flex-start;}
+.li{display:flex;align-items:center;gap:5px;font-family:var(--mo);font-size:11px;color:var(--mt);}
+.ld{width:9px;height:9px;border-radius:50%;}
+.mbr{display:flex;gap:7px;}.mbr .btn{flex:1;}
+.pov{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .3s;}
+.pov.open{opacity:1;pointer-events:all;}
+.panel{position:fixed;bottom:0;left:0;right:0;z-index:850;background:var(--s1);border:1px solid var(--b1);border-bottom:none;border-radius:20px 20px 0 0;transform:translateY(100%);transition:transform .35s cubic-bezier(.32,1,.5,1);max-height:85vh;overflow-y:auto;}
+.panel.open{transform:translateY(0);}
+.ph{width:36px;height:4px;border-radius:2px;background:var(--b2);margin:13px auto 0;}
+.pt{font-size:16px;font-weight:700;padding:12px 20px 0;}
+.pb{padding:14px 20px 36px;display:flex;flex-direction:column;gap:12px;}
+#toast{position:fixed;bottom:100px;left:50%;z-index:9999;transform:translateX(-50%) translateY(14px);background:var(--s1);border:1px solid var(--b2);color:var(--tx);padding:10px 17px;border-radius:10px;font-size:12px;font-family:var(--mo);opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+.leaflet-container{background:#060a14 !important;}
+.leaflet-tile{filter:brightness(.58) saturate(.5) hue-rotate(195deg) contrast(1.1);}
+.leaflet-control-zoom a{background:var(--s1) !important;color:var(--tx) !important;border-color:var(--b1) !important;border-radius:8px !important;}
+.leaflet-control-zoom{border:1px solid var(--b1) !important;border-radius:10px !important;overflow:hidden;}
+.leaflet-popup-content-wrapper{background:var(--s1) !important;color:var(--tx) !important;border:1px solid var(--b1) !important;border-radius:10px !important;box-shadow:0 8px 30px rgba(0,0,0,.5) !important;font-family:var(--mo) !important;font-size:11px !important;}
+.leaflet-popup-tip{background:var(--s1) !important;}
+.pm{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;border:2.5px solid;}
+.pm-me{background:rgba(0,229,255,.15);border-color:var(--cy);box-shadow:0 0 14px rgba(0,229,255,.4);}
+.pm-ot{background:rgba(139,92,246,.15);border-color:var(--pu);box-shadow:0 0 14px rgba(139,92,246,.4);}
+.pm-sos{background:rgba(239,68,68,.2);border-color:var(--rd);box-shadow:0 0 18px rgba(239,68,68,.6);animation:sosG 1s infinite alternate;}
+</style>
 </head>
 <body>
 
-<!-- ═══════════════════════════ HOME SCREEN ═══════════════════════════ -->
+<!-- HOME -->
 <div id="home-screen" class="screen active">
-  <div class="logo-wrap">
-    <div class="logo-icon">📡</div>
-    <div class="logo-title">PingMe</div>
-    <div class="logo-sub">Zero-cost live location</div>
+<div class="si">
+  <div class="brand">
+    <div class="bi">📡</div>
+    <div><div class="bn">PingMe</div><div class="bt">Live Location Sharing</div></div>
   </div>
-
-  <div id="firebase-warning" class="setup-notice" style="display:none;">
-    ⚠️ <strong>Firebase not configured.</strong><br>
-    This app needs a free Firebase project.<br>
-    See <strong>SETUP.md</strong> included with this file<br>
-    for a 5-minute setup guide.
-  </div>
-
-  <div class="btn-group">
-    <button class="btn btn-primary" onclick="startSharing()">📍 Share My Location</button>
-    <div class="divider">or join a session</div>
-    <div class="card" style="padding:16px;">
-      <div class="input-wrap">
-        <input type="text" id="join-code" maxlength="6" placeholder="ENTER CODE" oninput="this.value=this.value.toUpperCase()" />
-        <button class="btn btn-secondary" onclick="joinRoom()">🔍 Track Someone</button>
+  <div id="firebase-warning" class="alert a-warn" style="display:none;"><div class="ai">⚠️</div><div>Firebase not configured. See SETUP.md for the free 5-min guide.</div></div>
+  <div class="card" style="animation-delay:.05s">
+    <div class="ch"><div class="cl">Your Identity</div></div>
+    <div class="cb" style="padding:12px;">
+      <div class="nrow">
+        <div class="nprev" id="name-emoji">👤</div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:7px;">
+          <input type="text" id="username-input" class="ni" placeholder="Your display name…" maxlength="20" oninput="onNameInput()" />
+          <div style="display:flex;gap:4px;flex-wrap:wrap;">
+            <span onclick="setEmoji(this)" style="cursor:pointer;font-size:19px;padding:2px;">👤</span>
+            <span onclick="setEmoji(this)" style="cursor:pointer;font-size:19px;padding:2px;">🧑</span>
+            <span onclick="setEmoji(this)" style="cursor:pointer;font-size:19px;padding:2px;">👩</span>
+            <span onclick="setEmoji(this)" style="cursor:pointer;font-size:19px;padding:2px;">🧔</span>
+            <span onclick="setEmoji(this)" style="cursor:pointer;font-size:19px;padding:2px;">🚗</span>
+            <span onclick="setEmoji(this)" style="cursor:pointer;font-size:19px;padding:2px;">🏃</span>
+            <span onclick="setEmoji(this)" style="cursor:pointer;font-size:19px;padding:2px;">🚴</span>
+            <span onclick="setEmoji(this)" style="cursor:pointer;font-size:19px;padding:2px;">⭐</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+  <button class="btn bc" onclick="startSharing()" style="animation-delay:.08s">📍 Share My Location</button>
+  <div class="divider" style="animation-delay:.11s">join a session</div>
+  <div class="card" style="animation-delay:.13s">
+    <div class="ch"><div class="cl">Enter Room Code</div></div>
+    <div class="cb" style="display:flex;flex-direction:column;gap:8px;">
+      <input type="text" id="join-code" maxlength="6" placeholder="XXXXXX" oninput="this.value=this.value.replace(/[^A-Za-z0-9]/g,'').toUpperCase()" />
+      <button class="btn bp" onclick="joinRoom()">🔍 Track Someone</button>
+    </div>
+  </div>
+  <div class="divider" style="animation-delay:.16s">emergency</div>
+  <div class="card" style="animation-delay:.19s;border-color:rgba(239,68,68,.2);">
+    <div class="ch"><div class="cl">SOS Emergency Broadcast</div><div class="pill"><div class="dot sos"></div>No room needed</div></div>
+    <div class="cb" style="display:flex;flex-direction:column;align-items:center;gap:13px;padding:18px 15px;">
+      <div class="sos-wrap">
+        <div class="sos-ring"></div><div class="sos-ring"></div><div class="sos-ring"></div>
+        <button class="sos-btn" id="home-sos-btn" onclick="activateSOS()"><span style="font-size:26px;">🆘</span><span>SOS</span></button>
+      </div>
+      <div class="alert a-red" style="width:100%;"><div class="ai">⚠️</div><div>Broadcasts GPS to ALL PingMe users nearby. Genuine emergencies only.</div></div>
+    </div>
+  </div>
+</div>
 </div>
 
-<!-- ═══════════════════════════ SHARING SCREEN ═══════════════════════════ -->
+<!-- SHARE -->
 <div id="share-screen" class="screen">
-  <div class="logo-wrap" style="gap:4px;">
-    <div style="font-size:13px;font-family:var(--font-mono);color:var(--muted);">YOUR ROOM CODE</div>
-    <div class="room-code-display" id="display-code">——</div>
-    <div class="share-hint">Share this code with the person<br>who wants to track you</div>
+<div class="si">
+  <div class="brand">
+    <div class="bi">📡</div>
+    <div><div class="bn">PingMe</div><div class="bt">Broadcasting Live</div></div>
+    <div class="pill" style="margin-left:auto;"><div class="dot share"></div><span id="share-status-text">Getting GPS…</span></div>
   </div>
-
   <div class="card">
-    <div class="card-title">My Status</div>
-    <div style="display:flex;flex-direction:column;gap:12px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <span style="font-size:13px;font-family:var(--font-mono);">Broadcasting</span>
-        <div class="status-pill"><div class="dot green" id="share-dot"></div><span id="share-status-text">Getting GPS…</span></div>
-      </div>
-      <div id="my-coords" class="coords-row" style="display:none;">
-        <span>LAT</span><span id="my-lat">—</span>
-        <span style="margin-left:8px;">LON</span><span id="my-lon">—</span>
-      </div>
-      <div id="tracker-status" style="font-size:12px;font-family:var(--font-mono);color:var(--muted);">
-        Waiting for someone to join…
-      </div>
+    <div class="ch"><div class="cl">Your Room Code</div></div>
+    <div class="cb" style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+      <div class="code-big" id="display-code">——</div>
+      <div class="code-hint">Share this code so others can track you</div>
+      <div class="cbox" id="my-coords-box" style="display:none;width:100%;"><span>LAT</span><span id="my-lat">—</span><span style="margin-left:5px;">LON</span><span id="my-lon">—</span><span style="margin-left:5px;">±</span><span id="my-acc">—</span>m</div>
     </div>
   </div>
-
-  <div class="btn-group">
-    <button class="btn btn-primary" onclick="copyCode()">📋 Copy Code</button>
-    <button class="btn btn-success" onclick="viewMyMap()">🗺️ View on Map</button>
-    <button class="btn btn-danger btn-sm" onclick="stopSharing()">✕ Stop Sharing</button>
+  <div class="stitle">📤 Share Location</div>
+  <div class="card">
+    <div class="cb" style="display:flex;flex-direction:column;gap:8px;padding:12px;">
+      <div class="brow">
+        <button class="btn bgh bsm" onclick="copyCode()">📋 Copy Code</button>
+        <button class="btn bgh bsm" onclick="shareLink()">🔗 Copy Link</button>
+      </div>
+      <button class="btn bw" onclick="shareWA('room')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Share Room via WhatsApp
+      </button>
+      <button class="btn bgh bsm" onclick="shareGMaps('current')">🗺️ Send Google Maps Link via WhatsApp</button>
+      <button class="btn bgh bsm" onclick="copyGPS()">📌 Copy GPS Coordinates</button>
+    </div>
+  </div>
+  <div class="stitle">👥 People in Room</div>
+  <div class="card"><div class="ulist" id="user-list-share"><div class="uitem" style="justify-content:center;font-family:var(--mo);font-size:12px;color:var(--mt);padding:18px;">Waiting for others…</div></div></div>
+  <div class="brow">
+    <button class="btn bg bsm" onclick="goToMap('share')">🗺️ View Map</button>
+    <button class="btn bgh bsm" onclick="stopSharing()">✕ Stop Sharing</button>
+  </div>
+  <div class="card" style="border-color:rgba(239,68,68,.2);">
+    <div class="cb" style="padding:12px;display:flex;align-items:center;gap:12px;">
+      <button class="sos-btn" id="share-sos-btn" onclick="activateSOS()" style="width:58px;height:58px;font-size:9px;flex-shrink:0;"><span style="font-size:19px;">🆘</span><span>SOS</span></button>
+      <div style="flex:1;"><div style="font-size:13px;font-weight:700;color:var(--rd);">Emergency SOS</div><div style="font-size:11px;font-family:var(--mo);color:var(--mt);margin-top:3px;">Broadcast to ALL users — no room needed</div></div>
+    </div>
   </div>
 </div>
+</div>
 
-<!-- ═══════════════════════════ MAP SCREEN ═══════════════════════════ -->
+<!-- MAP -->
 <div id="map-screen" class="screen">
   <div id="map"></div>
-  <div class="map-header">
-    <button class="back-btn" onclick="leaveMap()">← Back</button>
-    <div class="room-tag" id="map-room-label">——</div>
-    <div id="map-status-pill" class="status-pill" style="margin-left:auto;">
-      <div class="dot blue" id="map-dot"></div>
-      <span id="map-status-text">Live</span>
-    </div>
+  <div class="map-top">
+    <button class="mbk" onclick="leaveMap()">← Back</button>
+    <div class="mrb" id="map-room-label">——</div>
+    <div class="pill" style="margin-left:auto;"><div class="dot live" id="map-dot"></div><span id="map-status-text">Live</span></div>
   </div>
-  <div class="map-footer">
-    <div class="legend">
-      <div class="legend-item">
-        <div class="legend-dot" style="background:var(--accent);"></div>
-        <span id="me-label">Me</span>
-      </div>
-      <div class="legend-item" id="other-legend" style="display:none;">
-        <div class="legend-dot" style="background:var(--accent2);"></div>
-        <span id="other-label">Other</span>
-      </div>
+  <div class="map-bot">
+    <div class="mleg" id="map-legend"><div class="li"><div class="ld" style="background:var(--cy)"></div><span id="leg-me">Me</span></div></div>
+    <div class="mbr">
+      <button class="btn bgh bsm" onclick="centerMap()">⌖ Center</button>
+      <button class="btn bgh bsm" onclick="openPanel()">👥 Users</button>
+      <button class="btn bw bsm" onclick="shareGMaps('current')">📤 Share</button>
     </div>
-    <button class="btn btn-secondary btn-sm" onclick="centerMap()" style="width:auto;">⌖ Center</button>
   </div>
 </div>
 
-<!-- ═══════════════════════════ TOAST ═══════════════════════════ -->
+<!-- SOS SCREEN -->
+<div id="sos-screen" class="screen">
+<div class="si">
+  <div class="brand">
+    <div class="bi red">🆘</div>
+    <div><div class="bn red">SOS ACTIVE</div><div class="bt">Emergency broadcast ON</div></div>
+    <div class="pill" style="margin-left:auto;border-color:rgba(239,68,68,.4);"><div class="dot sos"></div><span style="color:var(--rd);">Live</span></div>
+  </div>
+  <div class="alert a-red"><div class="ai">🚨</div><div>Your location is broadcasting to ALL PingMe users. Nearby users have been alerted.</div></div>
+  <div class="card" style="border-color:rgba(239,68,68,.3);">
+    <div class="ch"><div class="cl" style="color:var(--rd);">Live SOS Coordinates</div></div>
+    <div class="cb" style="display:flex;flex-direction:column;gap:10px;">
+      <div class="cbox" style="border-color:rgba(239,68,68,.3);color:var(--rd);"><span style="color:rgba(239,68,68,.6);">LAT</span><span id="sos-lat">—</span><span style="margin-left:5px;color:rgba(239,68,68,.6);">LON</span><span id="sos-lon">—</span></div>
+      <div id="sos-nearby-count" style="font-family:var(--mo);font-size:12px;color:var(--mt);">Searching for nearby users…</div>
+    </div>
+  </div>
+  <div class="stitle">📣 Notify Emergency Contacts</div>
+  <div class="card">
+    <div class="cb" style="display:flex;flex-direction:column;gap:8px;padding:12px;">
+      <button class="btn bw" onclick="shareSOSWA()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Send SOS via WhatsApp
+      </button>
+      <button class="btn bgh bsm" onclick="shareGMaps('sos')">🗺️ Send Google Maps Link via WhatsApp</button>
+      <button class="btn br bsm" onclick="callEmergency()">📞 Call Emergency Services (999)</button>
+    </div>
+  </div>
+  <button class="btn bg" onclick="deactivateSOS()">✅ I'm Safe — Cancel SOS</button>
+  <div style="font-family:var(--mo);font-size:10px;color:var(--mt);text-align:center;line-height:1.8;">SOS stays active until you cancel.<br>Only press above when you are genuinely safe.</div>
+</div>
+</div>
+
+<!-- USERS PANEL -->
+<div class="pov" id="pov" onclick="closePanel()"></div>
+<div class="panel" id="panel">
+  <div class="ph"></div>
+  <div class="pt">👥 Room Members</div>
+  <div class="pb">
+    <div class="card" style="padding:0;overflow:hidden;"><div class="ulist" id="panel-ulist"><div class="uitem" style="justify-content:center;font-family:var(--mo);font-size:12px;color:var(--mt);padding:18px;">Loading…</div></div></div>
+    <button class="btn bw" onclick="shareWA('room')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Share Room Link via WhatsApp
+    </button>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════════════════════════════
-//  STATE
-// ═══════════════════════════════════════════════════════════════
-let state = {
-  mode: null,        // 'sharer' | 'tracker'
-  roomCode: null,
-  myUserId: null,
-  otherUserId: null,
-  watchId: null,
-  map: null,
-  myMarker: null,
-  otherMarker: null,
-  myPos: null,
-  otherPos: null,
-  listeners: [],
-  firebaseOk: false,
-};
-
-// ═══════════════════════════════════════════════════════════════
-//  FIREBASE READY CHECK
-// ═══════════════════════════════════════════════════════════════
-document.addEventListener('firebase-ready', () => {
-  state.firebaseOk = true;
-  document.getElementById('firebase-warning').style.display = 'none';
-  // Quick test — if databaseURL is placeholder, show warning
-  if (!window._db) return;
-});
-
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    if (!state.firebaseOk) {
-      document.getElementById('firebase-warning').style.display = 'block';
-    }
-  }, 2000);
-});
-
-// ═══════════════════════════════════════════════════════════════
-//  UTILS
-// ═══════════════════════════════════════════════════════════════
-function genCode() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  return Array.from({length: 6}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+const S={mode:null,roomCode:null,myId:rId(),myName:'User',myEmoji:'👤',myPos:null,watchId:null,sosActive:false,sosWatchId:null,map:null,markers:{},users:{},listeners:[],firebaseOk:false,appUrl:location.href.split('?')[0]};
+function rId(){return Math.random().toString(36).slice(2,10);}
+function rCode(){return Array.from({length:6},()=>'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random()*32)]).join('');}
+document.addEventListener('firebase-ready',()=>{S.firebaseOk=true;document.getElementById('firebase-warning').style.display='none';watchSOSChannel();});
+window.addEventListener('load',()=>{setTimeout(()=>{if(!S.firebaseOk)document.getElementById('firebase-warning').style.display='flex';},2800);});
+function dbR(p){return window._ref(window._db,p);}
+function dbSet(p,d){return window._set(dbR(p),d);}
+function dbDel(p){return window._remove(dbR(p));}
+function dbOn(p,cb){const u=window._onValue(dbR(p),cb);S.listeners.push(u);return u;}
+function cleanL(){S.listeners.forEach(u=>{try{u();}catch(e){}});S.listeners=[];}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='map-screen'&&S.map)setTimeout(()=>S.map.invalidateSize(),150);}
+function showToast(msg,ms=2800){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),ms);}
+function tAgo(ts){const s=Math.round((Date.now()-ts)/1000);return s<10?'now':s<60?s+'s':s<3600?Math.floor(s/60)+'m':Math.floor(s/3600)+'h';}
+function hav(a,b,c,d){const R=6371,da=(c-a)*Math.PI/180,db=(d-b)*Math.PI/180,x=Math.sin(da/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(db/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
+function onNameInput(){S.myName=document.getElementById('username-input').value.trim()||'User';}
+function setEmoji(el){S.myEmoji=el.textContent;document.getElementById('name-emoji').textContent=el.textContent;}
+function gpsW(cb,ecb){if(!navigator.geolocation){showToast('❌ GPS not available');return null;}return navigator.geolocation.watchPosition(p=>cb(p.coords.latitude,p.coords.longitude,p.coords.accuracy),e=>{if(ecb)ecb(e);else showToast('⚠️ GPS: '+e.message);},{enableHighAccuracy:true,maximumAge:4000,timeout:12000});}
+function gpsO(cb){navigator.geolocation.getCurrentPosition(p=>cb(p.coords.latitude,p.coords.longitude),null,{enableHighAccuracy:true});}
+function gpsStop(id){if(id!=null)navigator.geolocation.clearWatch(id);}
+function initMap(lat=3.139,lng=101.687){if(S.map){S.map.remove();S.map=null;}S.markers={};const m=L.map('map',{zoomControl:true,attributionControl:false});L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(m);m.setView([lat,lng],16);S.map=m;}
+function mkI(uid){const isMe=uid===S.myId,isSOS=S.users[uid]?.sos,cls=isSOS?'pm pm-sos':isMe?'pm pm-me':'pm pm-ot',em=isMe?S.myEmoji:(isSOS?'🆘':(S.users[uid]?.emoji||'👤'));return L.divIcon({className:'',html:`<div class="${cls}">${em}</div>`,iconSize:[42,42],iconAnchor:[21,21]});}
+function upsert(uid,lat,lng,pop){if(!S.map)return;if(S.markers[uid]){S.markers[uid].setLatLng([lat,lng]);S.markers[uid].setIcon(mkI(uid));}else{const mk=L.marker([lat,lng],{icon:mkI(uid)}).addTo(S.map);if(pop)mk.bindPopup(pop);S.markers[uid]=mk;}}
+function rmMk(uid){if(S.markers[uid]){S.markers[uid].remove();delete S.markers[uid];}}
+function centerMap(){if(!S.map)return;const pts=Object.values(S.markers).map(m=>m.getLatLng());if(!pts.length)return;if(pts.length===1){S.map.setView(pts[0],16);return;}S.map.fitBounds(L.latLngBounds(pts),{padding:[60,60]});}
+function renderList(id){
+  const el=document.getElementById(id);if(!el)return;
+  const uids=Object.keys(S.users);
+  if(!uids.length){el.innerHTML='<div class="uitem" style="justify-content:center;font-family:var(--mo);font-size:12px;color:var(--mt);padding:18px;">No others here yet</div>';return;}
+  el.innerHTML=uids.map(uid=>{const u=S.users[uid],isMe=uid===S.myId,gm=`https://maps.google.com/?q=${u.lat},${u.lng}`,waMsg=encodeURIComponent(`📍 ${u.name}'s location:\n${gm}`),waUrl=`https://wa.me/?text=${waMsg}`,avC=isMe?'av-me':u.sos?'av-sos':'av-ot';
+    return `<div class="uitem"><div class="uav ${avC}">${u.emoji||'👤'}</div><div class="ui"><div class="un">${isMe?'You ('+u.name+')':u.name}${u.sos?' 🆘':''}</div><div class="uc">${u.lat?.toFixed(5)||'—'}, ${u.lng?.toFixed(5)||'—'}</div></div><div class="ut">${tAgo(u.ts||Date.now())}</div><div class="ua">${!isMe?`<button class="ib" onclick="window.open('${gm}','_blank')" title="Google Maps">🗺️</button><button class="ib" onclick="window.open('${waUrl}','_blank')" title="WhatsApp">💬</button>`:''}</div></div>`;
+  }).join('');
 }
-
-function genUserId() {
-  return Math.random().toString(36).slice(2, 10);
+function syncUI(){
+  renderList('user-list-share');renderList('panel-ulist');
+  const leg=document.getElementById('map-legend');if(!leg)return;
+  let h=`<div class="li"><div class="ld" style="background:var(--cy)"></div><span>${S.myEmoji} Me</span></div>`;
+  Object.entries(S.users).filter(([uid])=>uid!==S.myId).forEach(([uid,u])=>{h+=`<div class="li"><div class="ld" style="background:${u.sos?'var(--rd)':'var(--pu)'}"></div><span>${u.emoji||'👤'} ${u.name||'User'}${u.sos?' 🆘':''}</span></div>`;});
+  leg.innerHTML=h;
 }
-
-function showToast(msg, duration = 2500) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), duration);
-}
-
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  LEAFLET MAP INIT
-// ═══════════════════════════════════════════════════════════════
-function initMap(lat = 3.1390, lng = 101.6869) {
-  if (state.map) { state.map.remove(); state.map = null; }
-  const m = L.map('map', { zoomControl: true, attributionControl: false });
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-  }).addTo(m);
-  m.setView([lat, lng], 16);
-  state.map = m;
-}
-
-function makeIcon(type) {
-  return L.divIcon({
-    className: '',
-    html: `<div class="marker-${type}">${type === 'me' ? '🔵' : '🟣'}</div>`,
-    iconSize: [40, 40],
-    iconAnchor: [20, 20],
+function listenRoom(code){
+  dbOn(`rooms/${code}/users`,snap=>{
+    const data=snap.val()||{};
+    Object.keys(S.users).forEach(uid=>{if(!data[uid])rmMk(uid);});
+    S.users=data;
+    Object.entries(data).forEach(([uid,u])=>{if(!u.lat)return;upsert(uid,u.lat,u.lng,`<b>${u.emoji||'👤'} ${u.name||'User'}</b><br>${u.lat.toFixed(5)}, ${u.lng.toFixed(5)}`);});
+    syncUI();
+    const ot=Object.keys(data).filter(uid=>uid!==S.myId);
+    const st=document.getElementById('share-status-text');if(st)st.textContent=ot.length?`${ot.length} watching`:'Broadcasting';
   });
 }
-
-function updateMyMarker(lat, lng) {
-  if (!state.map) return;
-  if (!state.myMarker) {
-    state.myMarker = L.marker([lat, lng], { icon: makeIcon('me') }).addTo(state.map);
-    state.myMarker.bindTooltip('📍 Me', { permanent: false });
-  } else {
-    state.myMarker.setLatLng([lat, lng]);
-  }
-  state.myPos = { lat, lng };
-}
-
-function updateOtherMarker(lat, lng) {
-  if (!state.map) return;
-  if (!state.otherMarker) {
-    state.otherMarker = L.marker([lat, lng], { icon: makeIcon('other') }).addTo(state.map);
-    state.otherMarker.bindTooltip('📍 Other', { permanent: false });
-    document.getElementById('other-legend').style.display = 'flex';
-  } else {
-    state.otherMarker.setLatLng([lat, lng]);
-  }
-  state.otherPos = { lat, lng };
-}
-
-function centerMap() {
-  if (!state.map) return;
-  const points = [];
-  if (state.myPos) points.push([state.myPos.lat, state.myPos.lng]);
-  if (state.otherPos) points.push([state.otherPos.lat, state.otherPos.lng]);
-  if (points.length === 2) {
-    state.map.fitBounds(L.latLngBounds(points), { padding: [60, 60] });
-  } else if (points.length === 1) {
-    state.map.setView(points[0], 16);
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  GPS WATCH
-// ═══════════════════════════════════════════════════════════════
-function startGPS(onPos) {
-  if (!navigator.geolocation) { showToast('❌ GPS not supported'); return; }
-  const id = navigator.geolocation.watchPosition(
-    pos => onPos(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy),
-    err => showToast(`⚠️ GPS error: ${err.message}`),
-    { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
-  );
-  return id;
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  FIREBASE HELPERS
-// ═══════════════════════════════════════════════════════════════
-function dbRef(path) {
-  return window._ref(window._db, path);
-}
-
-function dbSet(path, data) {
-  return window._set(dbRef(path), data);
-}
-
-function dbListen(path, cb) {
-  const unsub = window._onValue(dbRef(path), cb);
-  state.listeners.push(unsub);
-  return unsub;
-}
-
-function dbRemove(path) {
-  return window._remove(dbRef(path));
-}
-
-function cleanupListeners() {
-  state.listeners.forEach(u => { try { u(); } catch(e){} });
-  state.listeners = [];
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  SHARING FLOW
-// ═══════════════════════════════════════════════════════════════
-async function startSharing() {
-  if (!state.firebaseOk) {
-    showToast('⚠️ Configure Firebase first! See SETUP.md');
-    return;
-  }
-  state.mode = 'sharer';
-  state.roomCode = genCode();
-  state.myUserId = genUserId();
-
-  document.getElementById('display-code').textContent = state.roomCode;
-  document.getElementById('share-status-text').textContent = 'Getting GPS…';
-  document.getElementById('map-room-label').textContent = state.roomCode;
-  document.getElementById('map-status-text').textContent = 'Sharing';
-  document.getElementById('me-label').textContent = 'Me (sharing)';
+async function startSharing(){
+  if(!S.firebaseOk){showToast('⚠️ Configure Firebase first!');return;}
+  S.mode='sharer';S.roomCode=rCode();
+  document.getElementById('display-code').textContent=S.roomCode;
+  document.getElementById('map-room-label').textContent=S.roomCode;
   showScreen('share-screen');
-
-  // Watch GPS & push to Firebase
-  state.watchId = startGPS(async (lat, lng, acc) => {
-    document.getElementById('share-status-text').textContent = 'Broadcasting';
-    document.getElementById('my-coords').style.display = 'flex';
-    document.getElementById('my-lat').textContent = lat.toFixed(5);
-    document.getElementById('my-lon').textContent = lng.toFixed(5);
-
-    await dbSet(`rooms/${state.roomCode}/users/${state.myUserId}`, {
-      lat, lng, acc,
-      ts: Date.now(),
-      role: 'sharer',
-    });
-
-    if (state.map && state.myPos) {
-      updateMyMarker(lat, lng);
-    }
+  S.watchId=gpsW(async(lat,lng,acc)=>{
+    S.myPos={lat,lng,acc};
+    document.getElementById('my-coords-box').style.display='flex';
+    document.getElementById('my-lat').textContent=lat.toFixed(5);
+    document.getElementById('my-lon').textContent=lng.toFixed(5);
+    document.getElementById('my-acc').textContent=Math.round(acc);
+    await dbSet(`rooms/${S.roomCode}/users/${S.myId}`,{lat,lng,acc,ts:Date.now(),name:S.myName,emoji:S.myEmoji,role:'sharer'});
+    if(S.map)upsert(S.myId,lat,lng);
   });
-
-  // Listen for others joining
-  dbListen(`rooms/${state.roomCode}/users`, snap => {
-    const users = snap.val();
-    if (!users) return;
-    const others = Object.entries(users).filter(([uid]) => uid !== state.myUserId);
-    if (others.length > 0) {
-      document.getElementById('tracker-status').textContent = `🟢 ${others.length} person tracking you`;
-    } else {
-      document.getElementById('tracker-status').textContent = 'Waiting for someone to join…';
-    }
-  });
+  listenRoom(S.roomCode);
 }
-
-function copyCode() {
-  navigator.clipboard.writeText(state.roomCode).then(() => showToast('✅ Code copied!')).catch(() => {
-    showToast(`Your code: ${state.roomCode}`);
-  });
+async function stopSharing(){
+  gpsStop(S.watchId);S.watchId=null;cleanL();
+  if(S.roomCode)await dbDel(`rooms/${S.roomCode}/users/${S.myId}`);
+  S.roomCode=null;S.mode=null;S.users={};
+  if(S.map){S.map.remove();S.map=null;}
+  showScreen('home-screen');showToast('📴 Stopped sharing');
 }
-
-async function stopSharing() {
-  if (state.watchId) { navigator.geolocation.clearWatch(state.watchId); state.watchId = null; }
-  cleanupListeners();
-  if (state.roomCode && state.myUserId) {
-    await dbRemove(`rooms/${state.roomCode}/users/${state.myUserId}`);
-  }
-  state.roomCode = null;
-  state.myUserId = null;
-  state.mode = null;
-  showScreen('home-screen');
-  showToast('📴 Stopped sharing');
+async function joinRoom(){
+  if(!S.firebaseOk){showToast('⚠️ Configure Firebase first!');return;}
+  const code=document.getElementById('join-code').value.trim().toUpperCase();
+  if(code.length!==6){showToast('⚠️ Enter the 6-char code');return;}
+  window._onValue(dbR(`rooms/${code}/users`),async snap=>{
+    if(!snap.exists()){showToast('❌ Room not found. Check the code.');return;}
+    S.mode='tracker';S.roomCode=code;document.getElementById('map-room-label').textContent=code;
+    S.users=snap.val()||{};goToMap('tracker');
+    S.watchId=gpsW(async(lat,lng,acc)=>{S.myPos={lat,lng,acc};await dbSet(`rooms/${S.roomCode}/users/${S.myId}`,{lat,lng,acc,ts:Date.now(),name:S.myName,emoji:S.myEmoji,role:'tracker'});if(S.map)upsert(S.myId,lat,lng);});
+    listenRoom(code);
+  },{onlyOnce:true});
 }
-
-async function viewMyMap() {
+function goToMap(from){
   showScreen('map-screen');
-  setTimeout(() => {
-    const pos = state.myPos || { lat: 3.1390, lng: 101.6869 };
-    initMap(pos.lat, pos.lng);
-    if (state.myPos) updateMyMarker(state.myPos.lat, state.myPos.lng);
-
-    // Live-update map when own GPS changes
-    dbListen(`rooms/${state.roomCode}/users/${state.myUserId}`, snap => {
-      const d = snap.val();
-      if (!d) return;
-      updateMyMarker(d.lat, d.lng);
-    });
-
-    // Watch others on map too
-    dbListen(`rooms/${state.roomCode}/users`, snap => {
-      const users = snap.val();
-      if (!users) return;
-      Object.entries(users).forEach(([uid, d]) => {
-        if (uid !== state.myUserId) {
-          updateOtherMarker(d.lat, d.lng);
-        }
-      });
-    });
-  }, 100);
+  setTimeout(()=>{
+    const p=S.myPos||{lat:3.139,lng:101.687};initMap(p.lat,p.lng);
+    Object.entries(S.users).forEach(([uid,u])=>{if(!u.lat)return;upsert(uid,u.lat,u.lng,`<b>${u.emoji||'👤'} ${u.name}</b><br>${u.lat.toFixed(5)}, ${u.lng.toFixed(5)}`);});
+    if(S.myPos)upsert(S.myId,S.myPos.lat,S.myPos.lng);syncUI();centerMap();
+  },120);
 }
-
-function leaveMap() {
-  if (state.mode === 'sharer') showScreen('share-screen');
-  else if (state.mode === 'tracker') showScreen('home-screen');
-  else showScreen('home-screen');
+function leaveMap(){
+  if(S.mode==='sharer'){showScreen('share-screen');}
+  else{cleanL();gpsStop(S.watchId);S.watchId=null;if(S.roomCode)dbDel(`rooms/${S.roomCode}/users/${S.myId}`);S.roomCode=null;S.mode=null;S.users={};if(S.map){S.map.remove();S.map=null;}showScreen('home-screen');}
 }
-
-// ═══════════════════════════════════════════════════════════════
-//  TRACKING FLOW
-// ═══════════════════════════════════════════════════════════════
-async function joinRoom() {
-  if (!state.firebaseOk) {
-    showToast('⚠️ Configure Firebase first! See SETUP.md');
-    return;
+function openPanel(){renderList('panel-ulist');document.getElementById('panel').classList.add('open');document.getElementById('pov').classList.add('open');}
+function closePanel(){document.getElementById('panel').classList.remove('open');document.getElementById('pov').classList.remove('open');}
+function shareWA(type){
+  if(type==='room'&&S.roomCode){
+    const link=`${S.appUrl}?room=${S.roomCode}`;
+    const msg=`📍 *PingMe Live Location*\n\nI'm sharing my live location with you!\n\n🔑 *Room Code:* ${S.roomCode}\n🔗 *Join link:* ${link}\n\nOpen the link or enter the code in PingMe to see my location in real-time.`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
   }
-  const code = document.getElementById('join-code').value.trim().toUpperCase();
-  if (code.length !== 6) { showToast('⚠️ Enter a 6-character code'); return; }
-
-  // Check room exists
-  const roomRef = dbRef(`rooms/${code}/users`);
-  window._onValue(roomRef, async snap => {
-    if (!snap.exists()) { showToast('❌ Room not found. Check the code.'); return; }
-
-    state.mode = 'tracker';
-    state.roomCode = code;
-    state.myUserId = genUserId();
-
-    document.getElementById('map-room-label').textContent = code;
-    document.getElementById('map-status-text').textContent = 'Tracking';
-    document.getElementById('me-label').textContent = 'Me';
-    document.getElementById('other-label').textContent = 'Tracking';
-    showScreen('map-screen');
-
-    setTimeout(() => {
-      initMap(3.1390, 101.6869);
-
-      // Push my own GPS (optional — both sides can share)
-      state.watchId = startGPS(async (lat, lng, acc) => {
-        await dbSet(`rooms/${state.roomCode}/users/${state.myUserId}`, {
-          lat, lng, acc, ts: Date.now(), role: 'tracker',
-        });
-        updateMyMarker(lat, lng);
-      });
-
-      // Watch ALL users in room
-      dbListen(`rooms/${state.roomCode}/users`, roomSnap => {
-        const users = roomSnap.val();
-        if (!users) {
-          document.getElementById('map-status-text').textContent = 'Offline';
-          document.getElementById('map-dot').className = 'dot warn';
-          return;
-        }
-        Object.entries(users).forEach(([uid, d]) => {
-          if (uid === state.myUserId) {
-            updateMyMarker(d.lat, d.lng);
-          } else {
-            updateOtherMarker(d.lat, d.lng);
-            document.getElementById('map-status-text').textContent = 'Live';
-            document.getElementById('map-dot').className = 'dot green';
-          }
-        });
-      });
-    }, 100);
-  }, { onlyOnce: true });
 }
-
-// ═══════════════════════════════════════════════════════════════
-//  CLEANUP ON UNLOAD
-// ═══════════════════════════════════════════════════════════════
-window.addEventListener('beforeunload', () => {
-  if (state.watchId) navigator.geolocation.clearWatch(state.watchId);
-  if (state.roomCode && state.myUserId) {
-    dbRemove(`rooms/${state.roomCode}/users/${state.myUserId}`);
-  }
-});
+function shareGMaps(ctx){
+  const p=S.myPos;if(!p){showToast('⚠️ GPS not ready yet');return;}
+  const gm=`https://maps.google.com/?q=${p.lat},${p.lng}`,nm=S.myName||'Me';
+  const msg=ctx==='sos'
+    ?`🆘 *SOS EMERGENCY*\n\n*${nm}* needs immediate help!\n\n📍 Current location:\n${gm}\n\n📌 Coords: ${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}\n⏰ ${new Date().toLocaleTimeString()}`
+    :`📍 *${nm}'s Location*\n\nHere's my current location:\n${gm}\n\nCoords: ${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
+}
+function copyCode(){if(!S.roomCode)return;navigator.clipboard.writeText(S.roomCode).then(()=>showToast('✅ Code copied!')).catch(()=>showToast('Code: '+S.roomCode));}
+function shareLink(){if(!S.roomCode)return;const link=`${S.appUrl}?room=${S.roomCode}`;navigator.clipboard.writeText(link).then(()=>showToast('✅ Join link copied!')).catch(()=>showToast(link));}
+function copyGPS(){const p=S.myPos;if(!p){showToast('⚠️ GPS not ready');return;}const txt=`${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}`;navigator.clipboard.writeText(txt).then(()=>showToast('✅ GPS coordinates copied!')).catch(()=>showToast(txt));}
+async function activateSOS(){
+  if(!S.firebaseOk){showToast('⚠️ Firebase not configured');return;}
+  const ok=confirm('🆘 ACTIVATE SOS?\n\nThis broadcasts your location to ALL PingMe users.\n\nOnly use in genuine emergencies. Tap OK to confirm.');
+  if(!ok)return;
+  S.sosActive=true;document.querySelectorAll('.sos-btn').forEach(b=>b.classList.add('active-sos'));showScreen('sos-screen');
+  gpsO(async(lat,lng)=>{S.myPos={lat,lng};document.getElementById('sos-lat').textContent=lat.toFixed(6);document.getElementById('sos-lon').textContent=lng.toFixed(6);await dbSet(`sos/${S.myId}`,{lat,lng,ts:Date.now(),name:S.myName,emoji:S.myEmoji,active:true});showToast('🆘 SOS broadcast active',5000);});
+  S.sosWatchId=gpsW(async(lat,lng,acc)=>{S.myPos={lat,lng,acc};document.getElementById('sos-lat').textContent=lat.toFixed(6);document.getElementById('sos-lon').textContent=lng.toFixed(6);await dbSet(`sos/${S.myId}`,{lat,lng,acc,ts:Date.now(),name:S.myName,emoji:S.myEmoji,active:true});});
+  dbOn('sos',snap=>{const sos=snap.val()||{},mp=S.myPos,resp=Object.entries(sos).filter(([uid,u])=>uid!==S.myId&&!u.active&&u.lat&&mp&&hav(mp.lat,mp.lng,u.lat,u.lng)<10);document.getElementById('sos-nearby-count').textContent=resp.length>0?`✅ ${resp.length} PingMe user(s) nearby alerted`:'🔍 Searching for nearby PingMe users…';});
+}
+async function deactivateSOS(){
+  const ok=confirm('Confirm you are SAFE and want to cancel SOS.');if(!ok)return;
+  S.sosActive=false;gpsStop(S.sosWatchId);S.sosWatchId=null;await dbDel(`sos/${S.myId}`);
+  document.querySelectorAll('.sos-btn').forEach(b=>b.classList.remove('active-sos'));cleanL();showScreen('home-screen');showToast('✅ SOS cancelled. Stay safe!');
+}
+function shareSOSWA(){const p=S.myPos||{lat:0,lng:0};const gm=`https://maps.google.com/?q=${p.lat},${p.lng}`;const msg=`🆘 *EMERGENCY SOS*\n\n*${S.myName}* needs immediate help!\n\n📍 Live location:\n${gm}\n\n📌 Coords: ${p.lat.toFixed(6)}, ${p.lng.toFixed(6)}\n⏰ ${new Date().toLocaleTimeString()}\n\n_Please call emergency services or go to this location._`;window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');}
+function callEmergency(){const p=S.myPos;if(confirm(`Call 999 (Emergency)?\n\n${p?`Your coords: ${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`:''}`))window.location.href='tel:999';}
+function watchSOSChannel(){
+  window._onValue(dbR('sos'),snap=>{
+    const sos=snap.val()||{};
+    Object.entries(sos).forEach(([uid,u])=>{if(!u.active||uid===S.myId||!S.myPos||!u.lat)return;const km=hav(S.myPos.lat,S.myPos.lng,u.lat,u.lng);if(km<50){const dist=km<1?(km*1000).toFixed(0)+'m':km.toFixed(1)+'km';showToast(`🆘 SOS! ${u.name||'Someone'} needs help ${dist} away!`,8000);if(S.map)upsert('sos_'+uid,u.lat,u.lng,`<b>🆘 SOS: ${u.name}</b>`);}});
+  });
+}
+(function(){const room=new URLSearchParams(location.search).get('room');if(room){document.getElementById('join-code').value=room.toUpperCase();showToast(`🔑 Room ${room} — tap Track to join`,4000);}})();
+window.addEventListener('beforeunload',()=>{gpsStop(S.watchId);gpsStop(S.sosWatchId);if(S.roomCode)dbDel(`rooms/${S.roomCode}/users/${S.myId}`);if(S.sosActive)dbDel(`sos/${S.myId}`);});
 </script>
 </body>
 </html>

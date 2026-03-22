@@ -1,15 +1,16 @@
 {
   "name": "PingMe — Live Location",
   "short_name": "PingMe",
-  "description": "Zero-cost real-time GPS location sharing",
+  "description": "Zero-cost real-time GPS location sharing with emergency SOS broadcast",
   "start_url": "/index.html",
   "display": "standalone",
-  "background_color": "#080c18",
-  "theme_color": "#0a0f1e",
+  "background_color": "#060a14",
+  "theme_color": "#060a14",
   "orientation": "portrait",
+  "categories": ["utilities", "navigation"],
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='36' fill='%230a0f1e'/><text y='130' x='30' font-size='120'>📡</text></svg>",
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%23060a14'/><text y='135' x='24' font-size='130'>📡</text></svg>",
       "sizes": "192x192",
       "type": "image/svg+xml",
       "purpose": "any maskable"
