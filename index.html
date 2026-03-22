@@ -98,8 +98,8 @@ input.ni::placeholder{letter-spacing:.5px;}
 .ua{display:flex;gap:4px;}
 .ib{width:28px;height:28px;border-radius:6px;display:grid;place-items:center;font-size:13px;cursor:pointer;transition:all .15s;border:none;background:var(--s3);}
 .ib:active{transform:scale(.92);}
-.sos-wrap{position:relative;display:flex;align-items:center;justify-content:center;padding:8px 0;}
-.sos-ring{position:absolute;width:94px;height:94px;border-radius:50%;border:2px solid rgba(239,68,68,.3);animation:sosRing 2s ease-out infinite;}
+.sos-wrap{position:relative;display:flex;align-items:center;justify-content:center;padding:54px 0;overflow:hidden;border-radius:10px;}
+.sos-ring{position:absolute;width:94px;height:94px;border-radius:50%;border:2px solid rgba(239,68,68,.3);animation:sosRing 2s ease-out infinite;pointer-events:none;}
 .sos-ring:nth-child(2){animation-delay:.7s;}.sos-ring:nth-child(3){animation-delay:1.4s;}
 .sos-btn{position:relative;z-index:1;width:94px;height:94px;border-radius:50%;background:radial-gradient(circle,#e53e3e,#991b1b);border:none;color:#fff;font-family:var(--hd);font-weight:800;font-size:11px;letter-spacing:.5px;cursor:pointer;box-shadow:0 0 26px rgba(239,68,68,.5),0 0 52px rgba(239,68,68,.2);transition:all .15s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;outline:none;}
 .sos-btn:active{transform:scale(.94);}
@@ -193,7 +193,7 @@ input.ni::placeholder{letter-spacing:.5px;}
     </div>
   </div>
   <div class="divider" style="animation-delay:.16s">emergency</div>
-  <div class="card" style="animation-delay:.19s;border-color:rgba(239,68,68,.2);">
+  <div class="card" style="animation-delay:.19s;border-color:rgba(239,68,68,.2);isolation:isolate;">
     <div class="ch"><div class="cl">SOS Emergency Broadcast</div><div class="pill"><div class="dot sos"></div>No room needed</div></div>
     <div class="cb" style="display:flex;flex-direction:column;align-items:center;gap:13px;padding:18px 15px;">
       <div class="sos-wrap">
@@ -397,13 +397,24 @@ async function joinRoom(){
   if(!S.firebaseOk){showToast('⚠️ Configure Firebase first!');return;}
   const code=document.getElementById('join-code').value.trim().toUpperCase();
   if(code.length!==6){showToast('⚠️ Enter the 6-char code');return;}
-  window._onValue(dbR(`rooms/${code}/users`),async snap=>{
-    if(!snap.exists()){showToast('❌ Room not found. Check the code.');return;}
-    S.mode='tracker';S.roomCode=code;document.getElementById('map-room-label').textContent=code;
-    S.users=snap.val()||{};goToMap('tracker');
-    S.watchId=gpsW(async(lat,lng,acc)=>{S.myPos={lat,lng,acc};await dbSet(`rooms/${S.roomCode}/users/${S.myId}`,{lat,lng,acc,ts:Date.now(),name:S.myName,emoji:S.myEmoji,role:'tracker'});if(S.map)upsert(S.myId,lat,lng);});
-    listenRoom(code);
-  },{onlyOnce:true});
+  showToast('🔍 Looking up room…');
+  // Proper async snapshot — avoids onlyOnce callback timing issues
+  let snap;
+  try {
+    snap = await new Promise((resolve, reject) => {
+      const unsub = window._onValue(dbR(`rooms/${code}/users`), s => {
+        try { unsub(); } catch(e) {}
+        resolve(s);
+      }, err => reject(err));
+    });
+  } catch(e) {
+    showToast('❌ Connection error. Check Firebase config.'); return;
+  }
+  if(!snap.exists()){showToast('❌ Room not found. Check the code.');return;}
+  S.mode='tracker';S.roomCode=code;document.getElementById('map-room-label').textContent=code;
+  S.users=snap.val()||{};goToMap('tracker');
+  S.watchId=gpsW(async(lat,lng,acc)=>{S.myPos={lat,lng,acc};await dbSet(`rooms/${S.roomCode}/users/${S.myId}`,{lat,lng,acc,ts:Date.now(),name:S.myName,emoji:S.myEmoji,role:'tracker'});if(S.map)upsert(S.myId,lat,lng);});
+  listenRoom(code);
 }
 function goToMap(from){
   showScreen('map-screen');
@@ -422,8 +433,10 @@ function closePanel(){document.getElementById('panel').classList.remove('open');
 function shareWA(type){
   if(type==='room'&&S.roomCode){
     const link=`${S.appUrl}?room=${S.roomCode}`;
-    const msg=`📍 *PingMe Live Location*\n\nI'm sharing my live location with you!\n\n🔑 *Room Code:* ${S.roomCode}\n🔗 *Join link:* ${link}\n\nOpen the link or enter the code in PingMe to see my location in real-time.`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
+    const msg=`📍 *PingMe Live Location*\n\nI'm sharing my live location with you!\n\n🔑 *Room Code:* \`${S.roomCode}\`\n🔗 *Tap to join:* ${link}\n\nOr open PingMe and enter the code above to track me in real-time.`;
+    const waUrl=`https://wa.me/?text=${encodeURIComponent(msg)}`;
+    const w=window.open(waUrl,'_blank');
+    if(!w){ navigator.clipboard.writeText(link).then(()=>showToast('✅ Link copied (WhatsApp blocked pop-up)')).catch(()=>showToast('Share: '+link)); }
   }
 }
 function shareGMaps(ctx){
@@ -459,7 +472,20 @@ function watchSOSChannel(){
     Object.entries(sos).forEach(([uid,u])=>{if(!u.active||uid===S.myId||!S.myPos||!u.lat)return;const km=hav(S.myPos.lat,S.myPos.lng,u.lat,u.lng);if(km<50){const dist=km<1?(km*1000).toFixed(0)+'m':km.toFixed(1)+'km';showToast(`🆘 SOS! ${u.name||'Someone'} needs help ${dist} away!`,8000);if(S.map)upsert('sos_'+uid,u.lat,u.lng,`<b>🆘 SOS: ${u.name}</b>`);}});
   });
 }
-(function(){const room=new URLSearchParams(location.search).get('room');if(room){document.getElementById('join-code').value=room.toUpperCase();showToast(`🔑 Room ${room} — tap Track to join`,4000);}})();
+(function(){
+  const room=new URLSearchParams(location.search).get('room');
+  if(room){
+    const code=room.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6);
+    document.getElementById('join-code').value=code;
+    showToast(`🔑 Room ${code} detected — joining…`,3000);
+    // Auto-join once Firebase is ready
+    if(S.firebaseOk){
+      joinRoom();
+    } else {
+      document.addEventListener('firebase-ready',()=>{ setTimeout(joinRoom,400); },{once:true});
+    }
+  }
+})();
 window.addEventListener('beforeunload',()=>{gpsStop(S.watchId);gpsStop(S.sosWatchId);if(S.roomCode)dbDel(`rooms/${S.roomCode}/users/${S.myId}`);if(S.sosActive)dbDel(`sos/${S.myId}`);});
 </script>
 </body>
