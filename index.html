@@ -153,6 +153,31 @@ input.ni::placeholder{letter-spacing:.5px}
 .pm-me{background:rgba(0,229,255,.15);border-color:var(--cy);box-shadow:0 0 14px rgba(0,229,255,.4)}
 .pm-ot{background:rgba(139,92,246,.15);border-color:var(--pu);box-shadow:0 0 14px rgba(139,92,246,.4)}
 .pm-sos{background:rgba(239,68,68,.2);border-color:var(--rd);box-shadow:0 0 18px rgba(239,68,68,.6);animation:sosG 1s infinite alternate}
+/* ── SILENT TRACKER SCREEN ── */
+#tracker-screen{background:var(--bg)}
+.trk-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:24px;padding:40px 24px;text-align:center;position:relative;z-index:2}
+.trk-pulse-ring{position:absolute;width:180px;height:180px;border-radius:50%;border:2px solid rgba(0,229,255,.15);animation:trkRing 3s ease-out infinite;pointer-events:none}
+.trk-pulse-ring:nth-child(2){animation-delay:1s}.trk-pulse-ring:nth-child(3){animation-delay:2s}
+@keyframes trkRing{0%{transform:scale(.6);opacity:.8}100%{transform:scale(2.4);opacity:0}}
+.trk-center{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:16px}
+.trk-icon{width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(0,229,255,.2),rgba(0,229,255,.05));border:2px solid var(--cy);display:grid;place-items:center;font-size:38px;box-shadow:0 0 40px rgba(0,229,255,.3)}
+.trk-status{font-size:22px;font-weight:800;letter-spacing:-.5px}
+.trk-sub{font-family:var(--mo);font-size:11px;color:var(--mt);line-height:1.8}
+.trk-coords{font-family:var(--mo);font-size:13px;color:var(--cy);background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.15);padding:8px 16px;border-radius:10px;min-width:220px;text-align:center;line-height:2}
+.trk-meta{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.trk-chip{font-family:var(--mo);font-size:11px;background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:6px 12px;color:var(--mt)}
+.trk-chip b{color:var(--tx);display:block;font-size:13px}
+.trk-freq{font-family:var(--mo);font-size:12px;color:var(--cy);text-align:center}
+.wake-warn{background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.25);border-radius:12px;padding:12px 14px;font-family:var(--mo);font-size:11px;color:var(--or);line-height:1.8;max-width:360px;text-align:left}
+.trk-stop{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:var(--rd);padding:12px 28px;border-radius:12px;font-family:var(--hd);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;border-width:1px}
+.trk-stop:active{transform:scale(.96)}
+
+/* ── ADMIN PANEL additions ── */
+.freq-row{display:flex;gap:6px;flex-wrap:wrap}
+.freq-btn{flex:1;min-width:70px;padding:9px 8px;border:1px solid var(--b1);border-radius:9px;background:var(--s2);color:var(--mt);font-family:var(--mo);font-size:11px;cursor:pointer;transition:all .15s;text-align:center}
+.freq-btn.sel{border-color:var(--cy);color:var(--cy);background:rgba(0,229,255,.06)}
+.freq-btn:active{transform:scale(.95)}
+
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
@@ -225,10 +250,15 @@ input.ni::placeholder{letter-spacing:.5px}
         </div>
         <div id="banner-name-err" style="display:none;font-family:var(--mo);font-size:11px;color:var(--rd);padding:2px 0">⚠️ Please enter your name before joining</div>
       </div>
-      <button class="btn bp" id="autojoin-btn" onclick="joinRoom()" style="width:100%;font-size:15px;padding:15px">
-        <span id="autojoin-btn-text">🚀 Join Room Now</span>
-      </button>
-      <div style="font-size:11px;font-family:var(--mo);color:var(--mt);text-align:center">or enter a different code below</div>
+      <div style="display:flex;flex-direction:column;gap:8px;width:100%">
+        <button class="btn bp" id="autojoin-btn" onclick="joinRoom(false)" style="width:100%;font-size:15px;padding:15px">
+          <span id="autojoin-btn-text">🚀 Join Room Now</span>
+        </button>
+        <button class="btn bc" onclick="joinRoom(true)" style="font-size:13px;padding:12px">
+          📡 Join as Silent Tracker
+        </button>
+      </div>
+      <div style="font-size:11px;font-family:var(--mo);color:var(--mt);text-align:center">Silent tracker: minimal UI, keeps pinging even when screen dims</div>
     </div>
   </div>
 
@@ -237,7 +267,8 @@ input.ni::placeholder{letter-spacing:.5px}
     <div class="cb" style="display:flex;flex-direction:column;gap:8px">
       <input type="text" id="join-code" maxlength="6" placeholder="XXXXXX"
         oninput="this.value=this.value.replace(/[^A-Za-z0-9]/g,'').toUpperCase()"/>
-      <button class="btn bp" onclick="joinRoom()">🔍 Track Someone</button>
+      <button class="btn bp" onclick="joinRoom(false)">🔍 Join Room</button>
+      <button class="btn bgh bsm" onclick="joinRoom(true)">📡 Join as Silent Tracker</button>
     </div>
   </div>
   <div class="divider" style="animation-delay:.16s">emergency</div>
@@ -291,6 +322,8 @@ input.ni::placeholder{letter-spacing:.5px}
     <button class="btn bg bsm" onclick="goToMap()">🗺️ View Map</button>
     <button class="btn bgh bsm" onclick="stopSharing()">✕ Stop Sharing</button>
   </div>
+  <!-- Admin freq control injected here dynamically -->
+  <div id="share-admin-slot" style="width:100%"></div>
   <div class="card" style="border-color:rgba(239,68,68,.2)">
     <div class="cb" style="padding:12px;display:flex;align-items:center;gap:12px">
       <button class="sos-btn" id="share-sos-btn" onclick="activateSOS()" style="width:58px;height:58px;font-size:9px;flex-shrink:0"><span style="font-size:19px">🆘</span><span>SOS</span></button>
@@ -348,6 +381,61 @@ input.ni::placeholder{letter-spacing:.5px}
   <button class="btn bg" onclick="deactivateSOS()">✅ I'm Safe — Cancel SOS</button>
   <div style="font-family:var(--mo);font-size:10px;color:var(--mt);text-align:center;line-height:1.8">SOS stays active until you cancel.<br>Only press above when you are genuinely safe.</div>
 </div>
+</div>
+
+
+<!-- SILENT TRACKER SCREEN -->
+<div id="tracker-screen" class="screen">
+  <div class="trk-wrap">
+    <div class="trk-pulse-ring"></div>
+    <div class="trk-pulse-ring"></div>
+    <div class="trk-pulse-ring"></div>
+    <div class="trk-center">
+      <div class="trk-icon" id="trk-icon">📡</div>
+      <div class="trk-status" id="trk-status-txt">Acquiring GPS…</div>
+      <div class="trk-sub" id="trk-room-txt">Silent tracking active</div>
+      <div class="trk-coords" id="trk-coords">
+        <span style="color:var(--mt)">LAT</span> <span id="trk-lat">——</span><br>
+        <span style="color:var(--mt)">LON</span> <span id="trk-lon">——</span>
+      </div>
+      <div class="trk-meta">
+        <div class="trk-chip"><span>Pings sent</span><b id="trk-pings">0</b></div>
+        <div class="trk-chip"><span>Interval</span><b id="trk-interval-disp">—</b></div>
+        <div class="trk-chip"><span>Last ping</span><b id="trk-last">—</b></div>
+        <div class="trk-chip"><span>Accuracy</span><b id="trk-acc-disp">—</b></div>
+      </div>
+      <div class="wake-warn">
+        ⚠️ <b>Keep this screen open</b> for continuous tracking.<br>
+        Screen may lock — tap to wake if pings stop.<br>
+        <span style="color:var(--mt)">Browser limitation: tracking pauses if app is fully closed.</span>
+      </div>
+      <div class="trk-freq" id="trk-freq-txt"></div>
+      <button class="trk-stop" onclick="stopSilentTracker()">■ Stop Tracking &amp; Leave Room</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL — frequency control (shown on share screen) -->
+<div id="admin-freq-card" style="display:none;width:100%;max-width:420px">
+  <div class="card" style="border-color:rgba(0,229,255,.2)">
+    <div class="ch">
+      <div class="cl">⚙️ Tracker Frequency</div>
+      <div class="pill"><div class="dot share"></div><span style="color:var(--cy)">Admin</span></div>
+    </div>
+    <div class="cb" style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-family:var(--mo);font-size:11px;color:var(--mt);line-height:1.7">
+        Set how often trackers ping their location to the database. Lower = more battery drain.
+      </div>
+      <div class="freq-row" id="freq-btn-row">
+        <div class="freq-btn" onclick="setFreq(10000)">10s</div>
+        <div class="freq-btn sel" onclick="setFreq(30000)">30s</div>
+        <div class="freq-btn" onclick="setFreq(60000)">1 min</div>
+        <div class="freq-btn" onclick="setFreq(120000)">2 min</div>
+        <div class="freq-btn" onclick="setFreq(300000)">5 min</div>
+      </div>
+      <div id="freq-status" style="font-family:var(--mo);font-size:11px;color:var(--cy)">Current: 30 seconds</div>
+    </div>
+  </div>
 </div>
 
 <!-- PANEL -->
@@ -528,6 +616,7 @@ async function startSharing(){
     if(S.map) upsert(S.myId,lat,lng);
   });
   listenRoom(S.roomCode);
+  showAdminFreqPanel();
 }
 async function stopSharing(){
   gpsStop(S.watchId); S.watchId=null; cleanL();
@@ -538,7 +627,7 @@ async function stopSharing(){
 }
 
 // ── Join room ───────────────────────────────────────────────────────────
-async function joinRoom(){
+async function joinRoom(silentMode=false){
   if(!S.firebaseOk){ showToast('⚠️ Firebase not ready yet'); return; }
   const code=document.getElementById('join-code').value.trim().toUpperCase();
   if(code.length!==6){ showToast('⚠️ Enter the full 6-character code'); return; }
@@ -595,14 +684,26 @@ async function joinRoom(){
 
   S.mode='tracker'; S.roomCode=code; S.users=snap.val()||{};
   document.getElementById('map-room-label').textContent=code;
-  goToMap();
 
-  S.watchId=gpsW(async(lat,lng,acc)=>{
-    S.myPos={lat,lng,acc};
-    await fbSet(`rooms/${S.roomCode}/users/${S.myId}`,{lat,lng,acc,ts:Date.now(),name:S.myName,emoji:S.myEmoji,role:'tracker'});
-    if(S.map) upsert(S.myId,lat,lng);
-  });
-  listenRoom(code);
+  // Read admin-set frequency if present
+  try {
+    const freqSnap = await fbGet(`rooms/${code}/meta/freqMs`);
+    if(freqSnap.exists()) TRK.freqMs = freqSnap.val();
+  } catch(e){}
+
+  if(silentMode){
+    // SILENT TRACKER MODE — interval-based pings, minimal UI
+    await startSilentTracker();
+  } else {
+    // NORMAL MODE — continuous GPS watch + map view
+    goToMap();
+    S.watchId=gpsW(async(lat,lng,acc)=>{
+      S.myPos={lat,lng,acc};
+      await fbSet(`rooms/${S.roomCode}/users/${S.myId}`,{lat,lng,acc,ts:Date.now(),name:S.myName,emoji:S.myEmoji,role:'tracker'});
+      if(S.map) upsert(S.myId,lat,lng);
+    });
+    listenRoom(code);
+  }
 }
 
 function goToMap(){
@@ -749,9 +850,181 @@ function copyRules(){
     .catch(()=>showToast('Rules: { ".read": true, ".write": true }'));
 }
 
+// ── SILENT TRACKER ENGINE ────────────────────────────────────────────────
+const TRK = {
+  active:       false,
+  silentMode:   false,    // true = show minimal tracker screen
+  pingCount:    0,
+  intervalId:   null,
+  freqMs:       30000,    // default 30s — overridden by admin setting in Firebase
+  wakeLock:     null,
+  lastPos:      null,
+  visHidden:    false,
+};
+
+// ── Admin: set frequency and write to Firebase room ──
+function setFreq(ms){
+  TRK.freqMs = ms;
+  // Update button highlight
+  document.querySelectorAll('.freq-btn').forEach(b=>{
+    b.classList.toggle('sel', parseInt(b.getAttribute('onclick').match(/\d+/)[0])===ms);
+  });
+  const labels = {10000:'10 seconds',30000:'30 seconds',60000:'1 minute',120000:'2 minutes',300000:'5 minutes'};
+  document.getElementById('freq-status').textContent = 'Current: '+(labels[ms]||ms+'ms');
+  // Write freq to Firebase so all trackers in room pick it up
+  if(S.roomCode) fbSet(`rooms/${S.roomCode}/meta/freqMs`, ms);
+  // Restart our own interval if we're tracking
+  if(TRK.active && TRK.intervalId) {
+    clearInterval(TRK.intervalId);
+    TRK.intervalId = setInterval(doPing, TRK.freqMs);
+  }
+}
+
+// ── Listen for admin freq changes (tracker side) ──
+function listenFreq(code){
+  fbOn(`rooms/${code}/meta/freqMs`, snap=>{
+    const ms = snap.val();
+    if(!ms || ms===TRK.freqMs) return;
+    TRK.freqMs = ms;
+    const labels = {10000:'10s',30000:'30s',60000:'1min',120000:'2min',300000:'5min'};
+    const el = document.getElementById('trk-freq-txt');
+    if(el) el.textContent = '📶 Ping every '+(labels[ms]||ms+'ms')+' (set by admin)';
+    // Restart interval with new freq
+    if(TRK.active && TRK.intervalId){
+      clearInterval(TRK.intervalId);
+      TRK.intervalId = setInterval(doPing, TRK.freqMs);
+    }
+  });
+}
+
+// ── Single ping — get latest GPS and push to Firebase ──
+function doPing(){
+  if(!TRK.active || !S.roomCode) return;
+  navigator.geolocation.getCurrentPosition(
+    async pos=>{
+      const {latitude:lat, longitude:lng, accuracy:acc} = pos.coords;
+      S.myPos = {lat,lng,acc};
+      TRK.lastPos = {lat,lng,acc,ts:Date.now()};
+      TRK.pingCount++;
+      // Push to Firebase
+      try {
+        await fbSet(`rooms/${S.roomCode}/users/${S.myId}`,
+          {lat,lng,acc,ts:Date.now(),name:S.myName,emoji:S.myEmoji,role:'tracker',silent:TRK.silentMode});
+      } catch(e){ console.warn('Ping write failed:',e.message); }
+      // Update tracker screen UI
+      updateTrackerUI(lat,lng,acc);
+    },
+    err=>{ console.warn('Ping GPS error:',err.message); updateTrackerStatus('⚠️ GPS error — retrying…'); },
+    {enableHighAccuracy:true, timeout:8000, maximumAge:10000}
+  );
+}
+
+function updateTrackerUI(lat,lng,acc){
+  const el = id=>document.getElementById(id);
+  if(el('trk-lat'))    el('trk-lat').textContent    = lat.toFixed(6);
+  if(el('trk-lon'))    el('trk-lon').textContent    = lng.toFixed(6);
+  if(el('trk-pings'))  el('trk-pings').textContent  = TRK.pingCount;
+  if(el('trk-acc-disp')) el('trk-acc-disp').textContent = Math.round(acc)+'m';
+  if(el('trk-last'))   el('trk-last').textContent   = 'just now';
+  if(el('trk-status-txt')) el('trk-status-txt').textContent = '🟢 Tracking Active';
+  if(el('trk-icon'))   el('trk-icon').textContent   = S.myEmoji||'📡';
+  // Age the "last ping" label every second
+  if(TRK._lastPingTimer) clearInterval(TRK._lastPingTimer);
+  let secs=0;
+  TRK._lastPingTimer = setInterval(()=>{
+    secs++;
+    const lastEl=document.getElementById('trk-last');
+    if(lastEl) lastEl.textContent = secs<60?secs+'s ago':Math.floor(secs/60)+'m ago';
+  },1000);
+}
+
+function updateTrackerStatus(msg){
+  const el=document.getElementById('trk-status-txt');
+  if(el) el.textContent=msg;
+}
+
+// ── Wake Lock — keeps screen on while tracker is active ──
+async function requestWakeLock(){
+  if(!('wakeLock' in navigator)) return;
+  try {
+    TRK.wakeLock = await navigator.wakeLock.request('screen');
+    TRK.wakeLock.addEventListener('release',()=>{
+      // Re-acquire if still tracking (e.g. after tab goes visible again)
+      if(TRK.active) setTimeout(requestWakeLock, 500);
+    });
+    console.log('WakeLock acquired');
+  } catch(e){ console.warn('WakeLock failed:',e.message); }
+}
+
+function releaseWakeLock(){
+  if(TRK.wakeLock){ try{ TRK.wakeLock.release(); }catch(e){} TRK.wakeLock=null; }
+}
+
+// ── Visibility change handler — resume pinging when tab becomes visible ──
+document.addEventListener('visibilitychange',()=>{
+  if(!TRK.active) return;
+  if(document.visibilityState==='visible'){
+    // Re-acquire wake lock if needed
+    if(!TRK.wakeLock) requestWakeLock();
+    // Ping immediately on return
+    doPing();
+  }
+});
+
+// ── Start silent tracker mode ──
+async function startSilentTracker(){
+  TRK.active     = true;
+  TRK.silentMode = true;
+  TRK.pingCount  = 0;
+  // Show tracker screen
+  showScreen('tracker-screen');
+  // Update header
+  const roomEl = document.getElementById('trk-room-txt');
+  if(roomEl) roomEl.textContent = 'Room: '+S.roomCode+' · '+S.myName;
+  const freqLabels = {10000:'10s',30000:'30s',60000:'1min',120000:'2min',300000:'5min'};
+  const freqEl = document.getElementById('trk-freq-txt');
+  if(freqEl) freqEl.textContent='📶 Ping every '+(freqLabels[TRK.freqMs]||TRK.freqMs+'ms');
+  const intEl = document.getElementById('trk-interval-disp');
+  if(intEl) intEl.textContent = freqLabels[TRK.freqMs]||TRK.freqMs+'ms';
+  // Request wake lock to keep screen on
+  await requestWakeLock();
+  // Do first ping immediately
+  doPing();
+  // Start interval
+  TRK.intervalId = setInterval(doPing, TRK.freqMs);
+  // Listen for freq changes from admin
+  listenFreq(S.roomCode);
+  showToast('📡 Silent tracker active — screen kept on',4000);
+}
+
+// ── Stop silent tracker ──
+async function stopSilentTracker(){
+  TRK.active     = false;
+  TRK.silentMode = false;
+  clearInterval(TRK.intervalId); TRK.intervalId=null;
+  if(TRK._lastPingTimer){ clearInterval(TRK._lastPingTimer); TRK._lastPingTimer=null; }
+  releaseWakeLock();
+  gpsStop(S.watchId); S.watchId=null;
+  cleanL();
+  if(S.roomCode) await fbDel(`rooms/${S.roomCode}/users/${S.myId}`);
+  S.roomCode=null; S.mode=null; S.users={};
+  showScreen('home-screen');
+  showToast('📴 Tracker stopped');
+}
+
+// ── Show admin frequency panel when room created ──
+function showAdminFreqPanel(){
+  // Move admin-freq-card into the share-admin-slot
+  const slot = document.getElementById('share-admin-slot');
+  const card = document.getElementById('admin-freq-card');
+  if(slot && card){ slot.appendChild(card); card.style.display='block'; }
+}
+
 // ── Cleanup on tab close ────────────────────────────────────────────────
 window.addEventListener('beforeunload', ()=>{
   gpsStop(S.watchId); gpsStop(S.sosWatchId);
+  if(TRK.intervalId) clearInterval(TRK.intervalId);
+  releaseWakeLock();
   if(S.roomCode) fbDel(`rooms/${S.roomCode}/users/${S.myId}`);
   if(S.sosActive) fbDel(`sos/${S.myId}`);
 });
