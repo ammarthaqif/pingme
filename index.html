@@ -16,7 +16,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    import { getDatabase, ref, set, get, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
     // PASTE YOUR FREE FIREBASE CONFIG HERE — get it at firebase.google.com
 const firebaseConfig = {
   apiKey: "AIzaSyDPMQH8FzkjZMPTFR09cuMGYi5k9NmuIwQ",
@@ -31,7 +31,7 @@ const firebaseConfig = {
     try {
       const app = initializeApp(firebaseConfig);
       const db = getDatabase(app);
-      window._db=db; window._ref=ref; window._set=set; window._onValue=onValue; window._remove=remove;
+      window._db=db; window._ref=ref; window._set=set; window._get=get; window._onValue=onValue; window._remove=remove;
       window._firebaseReady=true;
       document.dispatchEvent(new Event("firebase-ready"));
     } catch(e){ console.warn('Firebase error:',e); }
@@ -413,19 +413,15 @@ async function joinRoom(){
   const code=document.getElementById('join-code').value.trim().toUpperCase();
   if(code.length!==6){showToast('⚠️ Enter the 6-char code');return Promise.reject('bad code');}
   showToast('🔍 Looking up room…');
-  // Proper async snapshot — avoids onlyOnce callback timing issues
+  // Use get() for a one-time read — avoids the unsub race condition entirely
   let snap;
   try {
-    snap = await new Promise((resolve, reject) => {
-      const unsub = window._onValue(dbR(`rooms/${code}/users`), s => {
-        try { unsub(); } catch(e) {}
-        resolve(s);
-      }, err => reject(err));
-    });
+    snap = await window._get(dbR(`rooms/${code}/users`));
   } catch(e) {
-    showToast('❌ Connection error. Check Firebase config.'); return;
+    console.error('joinRoom error:', e);
+    showToast('❌ Could not reach database. Check Firebase config.'); return;
   }
-  if(!snap.exists()){showToast('❌ Room not found. Check the code.');return;}
+  if(!snap || !snap.exists()){showToast('❌ Room not found. Check the code.');return;}
   S.mode='tracker';S.roomCode=code;document.getElementById('map-room-label').textContent=code;
   S.users=snap.val()||{};goToMap('tracker');
   S.watchId=gpsW(async(lat,lng,acc)=>{S.myPos={lat,lng,acc};await dbSet(`rooms/${S.roomCode}/users/${S.myId}`,{lat,lng,acc,ts:Date.now(),name:S.myName,emoji:S.myEmoji,role:'tracker'});if(S.map)upsert(S.myId,lat,lng);});
