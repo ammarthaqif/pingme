@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0a0f1e" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="PingMe" />
+  <title>PingMe — Live Location</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getDatabase, ref, set, onValue, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+    // =====================================================
+    // FIREBASE CONFIG — replace with YOUR config from
+    // https://console.firebase.google.com  (it's FREE)
+    // =====================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyDPMQH8FzkjZMPTFR09cuMGYi5k9NmuIwQ",
+  authDomain: "ping-me-1c3d9.firebaseapp.com",
+  databaseURL: "https://ping-me-1c3d9-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "ping-me-1c3d9",
+  storageBucket: "ping-me-1c3d9.firebasestorage.app",
+  messagingSenderId: "398925457761",
+  appId: "1:398925457761:web:5a776122569db9339dbd20",
+  measurementId: "G-PW1KGELMGL"
+};
+
+    const app = initializeApp(firebaseConfig);
+    const db  = getDatabase(app);
+    window._db  = db;
+    window._ref = ref;
+    window._set = set;
+    window._onValue = onValue;
+    window._remove  = remove;
+    window._serverTimestamp = serverTimestamp;
+    window._firebaseReady = true;
+    document.dispatchEvent(new Event("firebase-ready"));
+  </script>
+
+  <style>
+    /* ── RESET & BASE ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:         #080c18;
+      --surface:    #0f1628;
+      --surface2:   #161e38;
+      --border:     #1e2d55;
+      --accent:     #00d4ff;
+      --accent2:    #7c5cfc;
+      --warn:       #ff6b35;
+      --green:      #00e676;
+      --text:       #e8eaf6;
+      --muted:      #5c6bc0;
+      --font-head:  'Syne', sans-serif;
+      --font-mono:  'Space Mono', monospace;
+    }
+    html, body {
+      height: 100%; width: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-head);
+      overflow: hidden;
+    }
+
+    /* ── SCREENS ── */
+    .screen {
+      position: fixed; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 24px;
+      opacity: 0; pointer-events: none;
+      transition: opacity .35s ease;
+      z-index: 1;
+    }
+    .screen.active { opacity: 1; pointer-events: all; }
+
+    /* ── BACKGROUND GRID ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,212,255,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,255,.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(124,92,252,.12) 0%, transparent 65%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── HOME SCREEN ── */
+    #home-screen { gap: 32px; }
+
+    .logo-wrap {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      animation: fadeUp .6s ease both;
+    }
+    .logo-icon {
+      width: 72px; height: 72px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 22px;
+      display: grid; place-items: center;
+      font-size: 32px;
+      box-shadow: 0 0 40px rgba(0,212,255,.3), 0 0 80px rgba(124,92,252,.15);
+      position: relative;
+    }
+    .logo-icon::after {
+      content: '';
+      position: absolute; inset: -1px;
+      border-radius: 23px;
+      background: linear-gradient(135deg, rgba(0,212,255,.4), rgba(124,92,252,.4));
+      z-index: -1;
+    }
+    .logo-title {
+      font-size: 36px; font-weight: 800; letter-spacing: -1px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .logo-sub {
+      font-size: 13px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase;
+      font-family: var(--font-mono);
+    }
+
+    .btn-group {
+      display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 340px;
+      animation: fadeUp .6s .15s ease both;
+    }
+    .btn {
+      width: 100%; padding: 18px 24px;
+      border: none; border-radius: 14px;
+      font-family: var(--font-head); font-size: 15px; font-weight: 600;
+      cursor: pointer; transition: all .2s ease;
+      position: relative; overflow: hidden;
+      letter-spacing: .5px;
+    }
+    .btn::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: rgba(255,255,255,.08);
+      opacity: 0; transition: opacity .2s;
+    }
+    .btn:hover::before { opacity: 1; }
+    .btn:active { transform: scale(.97); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #0090c4);
+      color: #000; box-shadow: 0 4px 30px rgba(0,212,255,.3);
+    }
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-danger {
+      background: linear-gradient(135deg, var(--warn), #c94b1b);
+      color: #fff; box-shadow: 0 4px 20px rgba(255,107,53,.3);
+    }
+    .btn-success {
+      background: linear-gradient(135deg, var(--green), #00a152);
+      color: #000; box-shadow: 0 4px 20px rgba(0,230,118,.3);
+    }
+    .btn-sm {
+      padding: 12px 20px; font-size: 13px;
+    }
+
+    .divider {
+      display: flex; align-items: center; gap: 12px;
+      color: var(--muted); font-size: 12px; font-family: var(--font-mono);
+      width: 100%; max-width: 340px;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      width: 100%; max-width: 340px;
+      animation: fadeUp .35s ease both;
+    }
+    .card-title {
+      font-size: 14px; font-weight: 600; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 1.5px;
+      margin-bottom: 16px; font-family: var(--font-mono);
+    }
+
+    /* ── INPUT ── */
+    .input-wrap { display: flex; flex-direction: column; gap: 10px; }
+    input[type="text"] {
+      width: 100%; padding: 14px 16px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text);
+      font-family: var(--font-mono); font-size: 20px;
+      text-align: center; letter-spacing: 6px; text-transform: uppercase;
+      transition: border-color .2s;
+      outline: none;
+    }
+    input[type="text"]:focus { border-color: var(--accent); }
+    input[type="text"]::placeholder { color: var(--muted); letter-spacing: 3px; font-size: 14px; }
+
+    /* ── STATUS PILL ── */
+    .status-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 14px; border-radius: 99px;
+      font-size: 12px; font-family: var(--font-mono);
+      background: var(--surface2); border: 1px solid var(--border);
+    }
+    .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--muted);
+    }
+    .dot.green { background: var(--green); box-shadow: 0 0 8px var(--green); animation: pulse 2s infinite; }
+    .dot.blue  { background: var(--accent); box-shadow: 0 0 8px var(--accent); animation: pulse 2s infinite; }
+    .dot.warn  { background: var(--warn); box-shadow: 0 0 8px var(--warn); }
+
+    /* ── SHARE SCREEN ── */
+    #share-screen { gap: 20px; }
+    .room-code-display {
+      font-size: 42px; font-weight: 800; letter-spacing: 12px;
+      font-family: var(--font-mono);
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      text-align: center; padding: 8px 0;
+    }
+    .share-hint {
+      font-size: 12px; color: var(--muted); font-family: var(--font-mono);
+      text-align: center; line-height: 1.7;
+    }
+    .coords-row {
+      display: flex; gap: 8px; font-family: var(--font-mono);
+      font-size: 11px; color: var(--accent);
+    }
+    .coords-row span { opacity: .6; color: var(--muted); }
+
+    /* ── MAP SCREEN ── */
+    #map-screen {
+      padding: 0; justify-content: flex-start; align-items: stretch;
+    }
+    #map { flex: 1; z-index: 1; }
+    .map-header {
+      position: absolute; top: 0; left: 0; right: 0;
+      z-index: 999;
+      padding: 12px 16px;
+      background: linear-gradient(var(--bg), transparent);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .map-header .room-tag {
+      font-family: var(--font-mono); font-size: 12px;
+      background: rgba(8,12,24,.85); border: 1px solid var(--border);
+      padding: 6px 12px; border-radius: 8px; letter-spacing: 2px;
+      color: var(--accent);
+    }
+    .map-footer {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      z-index: 999;
+      padding: 16px;
+      background: linear-gradient(transparent, var(--bg));
+      display: flex; gap: 10px; justify-content: center;
+    }
+
+    /* ── LEGEND ── */
+    .legend {
+      display: flex; gap: 16px; align-items: center;
+      font-size: 11px; font-family: var(--font-mono);
+      color: var(--muted);
+      background: rgba(8,12,24,.85); border: 1px solid var(--border);
+      padding: 8px 14px; border-radius: 10px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); padding: 12px 22px; border-radius: 12px;
+      font-size: 13px; font-family: var(--font-mono);
+      opacity: 0; transition: all .3s ease; z-index: 9999;
+      white-space: nowrap; pointer-events: none;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── BACK BTN ── */
+    .back-btn {
+      background: rgba(8,12,24,.85); border: 1px solid var(--border);
+      color: var(--text); padding: 8px 14px; border-radius: 8px;
+      font-family: var(--font-mono); font-size: 12px; cursor: pointer;
+      transition: all .2s;
+    }
+    .back-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── LOADING ── */
+    .loader {
+      width: 20px; height: 20px;
+      border: 2px solid var(--border); border-top-color: var(--accent);
+      border-radius: 50%; animation: spin .7s linear infinite;
+      display: inline-block;
+    }
+    .loading-row { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); font-family: var(--font-mono); }
+
+    /* ── SETUP NOTICE ── */
+    .setup-notice {
+      background: rgba(255,107,53,.08);
+      border: 1px solid rgba(255,107,53,.3);
+      border-radius: 12px; padding: 16px;
+      font-size: 12px; font-family: var(--font-mono);
+      color: var(--warn); line-height: 1.8;
+      width: 100%; max-width: 340px;
+      animation: fadeUp .6s .3s ease both;
+    }
+    .setup-notice a { color: var(--accent); }
+    .setup-notice strong { color: var(--text); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: .4; }
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ── LEAFLET CUSTOMIZATION ── */
+    .leaflet-container { background: #0a0f1e !important; }
+    .leaflet-tile { filter: brightness(.7) saturate(.6) hue-rotate(200deg); }
+    .leaflet-control-zoom a {
+      background: var(--surface) !important;
+      color: var(--text) !important;
+      border-color: var(--border) !important;
+    }
+
+    /* ── CUSTOM MARKERS ── */
+    .marker-me, .marker-other {
+      width: 40px; height: 40px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; border: 3px solid;
+      box-shadow: 0 2px 20px rgba(0,0,0,.5);
+      animation: markerPop .4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .marker-me    { background: rgba(0,212,255,.2); border-color: var(--accent); }
+    .marker-other { background: rgba(124,92,252,.2); border-color: var(--accent2); }
+    @keyframes markerPop {
+      from { transform: scale(0); }
+      to   { transform: scale(1); }
+    }
+
+    /* ── FIREBASE NOT CONFIGURED ── */
+    .demo-badge {
+      background: rgba(255,107,53,.15); border: 1px solid rgba(255,107,53,.4);
+      color: var(--warn); padding: 4px 10px; border-radius: 6px;
+      font-size: 10px; font-family: var(--font-mono); letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════ HOME SCREEN ═══════════════════════════ -->
+<div id="home-screen" class="screen active">
+  <div class="logo-wrap">
+    <div class="logo-icon">📡</div>
+    <div class="logo-title">PingMe</div>
+    <div class="logo-sub">Zero-cost live location</div>
+  </div>
+
+  <div id="firebase-warning" class="setup-notice" style="display:none;">
+    ⚠️ <strong>Firebase not configured.</strong><br>
+    This app needs a free Firebase project.<br>
+    See <strong>SETUP.md</strong> included with this file<br>
+    for a 5-minute setup guide.
+  </div>
+
+  <div class="btn-group">
+    <button class="btn btn-primary" onclick="startSharing()">📍 Share My Location</button>
+    <div class="divider">or join a session</div>
+    <div class="card" style="padding:16px;">
+      <div class="input-wrap">
+        <input type="text" id="join-code" maxlength="6" placeholder="ENTER CODE" oninput="this.value=this.value.toUpperCase()" />
+        <button class="btn btn-secondary" onclick="joinRoom()">🔍 Track Someone</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ SHARING SCREEN ═══════════════════════════ -->
+<div id="share-screen" class="screen">
+  <div class="logo-wrap" style="gap:4px;">
+    <div style="font-size:13px;font-family:var(--font-mono);color:var(--muted);">YOUR ROOM CODE</div>
+    <div class="room-code-display" id="display-code">——</div>
+    <div class="share-hint">Share this code with the person<br>who wants to track you</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">My Status</div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:13px;font-family:var(--font-mono);">Broadcasting</span>
+        <div class="status-pill"><div class="dot green" id="share-dot"></div><span id="share-status-text">Getting GPS…</span></div>
+      </div>
+      <div id="my-coords" class="coords-row" style="display:none;">
+        <span>LAT</span><span id="my-lat">—</span>
+        <span style="margin-left:8px;">LON</span><span id="my-lon">—</span>
+      </div>
+      <div id="tracker-status" style="font-size:12px;font-family:var(--font-mono);color:var(--muted);">
+        Waiting for someone to join…
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-group">
+    <button class="btn btn-primary" onclick="copyCode()">📋 Copy Code</button>
+    <button class="btn btn-success" onclick="viewMyMap()">🗺️ View on Map</button>
+    <button class="btn btn-danger btn-sm" onclick="stopSharing()">✕ Stop Sharing</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ MAP SCREEN ═══════════════════════════ -->
+<div id="map-screen" class="screen">
+  <div id="map"></div>
+  <div class="map-header">
+    <button class="back-btn" onclick="leaveMap()">← Back</button>
+    <div class="room-tag" id="map-room-label">——</div>
+    <div id="map-status-pill" class="status-pill" style="margin-left:auto;">
+      <div class="dot blue" id="map-dot"></div>
+      <span id="map-status-text">Live</span>
+    </div>
+  </div>
+  <div class="map-footer">
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-dot" style="background:var(--accent);"></div>
+        <span id="me-label">Me</span>
+      </div>
+      <div class="legend-item" id="other-legend" style="display:none;">
+        <div class="legend-dot" style="background:var(--accent2);"></div>
+        <span id="other-label">Other</span>
+      </div>
+    </div>
+    <button class="btn btn-secondary btn-sm" onclick="centerMap()" style="width:auto;">⌖ Center</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ TOAST ═══════════════════════════ -->
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════════
+let state = {
+  mode: null,        // 'sharer' | 'tracker'
+  roomCode: null,
+  myUserId: null,
+  otherUserId: null,
+  watchId: null,
+  map: null,
+  myMarker: null,
+  otherMarker: null,
+  myPos: null,
+  otherPos: null,
+  listeners: [],
+  firebaseOk: false,
+};
+
+// ═══════════════════════════════════════════════════════════════
+//  FIREBASE READY CHECK
+// ═══════════════════════════════════════════════════════════════
+document.addEventListener('firebase-ready', () => {
+  state.firebaseOk = true;
+  document.getElementById('firebase-warning').style.display = 'none';
+  // Quick test — if databaseURL is placeholder, show warning
+  if (!window._db) return;
+});
+
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    if (!state.firebaseOk) {
+      document.getElementById('firebase-warning').style.display = 'block';
+    }
+  }, 2000);
+});
+
+// ═══════════════════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════════════════
+function genCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  return Array.from({length: 6}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+}
+
+function genUserId() {
+  return Math.random().toString(36).slice(2, 10);
+}
+
+function showToast(msg, duration = 2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), duration);
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  LEAFLET MAP INIT
+// ═══════════════════════════════════════════════════════════════
+function initMap(lat = 3.1390, lng = 101.6869) {
+  if (state.map) { state.map.remove(); state.map = null; }
+  const m = L.map('map', { zoomControl: true, attributionControl: false });
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+  }).addTo(m);
+  m.setView([lat, lng], 16);
+  state.map = m;
+}
+
+function makeIcon(type) {
+  return L.divIcon({
+    className: '',
+    html: `<div class="marker-${type}">${type === 'me' ? '🔵' : '🟣'}</div>`,
+    iconSize: [40, 40],
+    iconAnchor: [20, 20],
+  });
+}
+
+function updateMyMarker(lat, lng) {
+  if (!state.map) return;
+  if (!state.myMarker) {
+    state.myMarker = L.marker([lat, lng], { icon: makeIcon('me') }).addTo(state.map);
+    state.myMarker.bindTooltip('📍 Me', { permanent: false });
+  } else {
+    state.myMarker.setLatLng([lat, lng]);
+  }
+  state.myPos = { lat, lng };
+}
+
+function updateOtherMarker(lat, lng) {
+  if (!state.map) return;
+  if (!state.otherMarker) {
+    state.otherMarker = L.marker([lat, lng], { icon: makeIcon('other') }).addTo(state.map);
+    state.otherMarker.bindTooltip('📍 Other', { permanent: false });
+    document.getElementById('other-legend').style.display = 'flex';
+  } else {
+    state.otherMarker.setLatLng([lat, lng]);
+  }
+  state.otherPos = { lat, lng };
+}
+
+function centerMap() {
+  if (!state.map) return;
+  const points = [];
+  if (state.myPos) points.push([state.myPos.lat, state.myPos.lng]);
+  if (state.otherPos) points.push([state.otherPos.lat, state.otherPos.lng]);
+  if (points.length === 2) {
+    state.map.fitBounds(L.latLngBounds(points), { padding: [60, 60] });
+  } else if (points.length === 1) {
+    state.map.setView(points[0], 16);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  GPS WATCH
+// ═══════════════════════════════════════════════════════════════
+function startGPS(onPos) {
+  if (!navigator.geolocation) { showToast('❌ GPS not supported'); return; }
+  const id = navigator.geolocation.watchPosition(
+    pos => onPos(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy),
+    err => showToast(`⚠️ GPS error: ${err.message}`),
+    { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
+  );
+  return id;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  FIREBASE HELPERS
+// ═══════════════════════════════════════════════════════════════
+function dbRef(path) {
+  return window._ref(window._db, path);
+}
+
+function dbSet(path, data) {
+  return window._set(dbRef(path), data);
+}
+
+function dbListen(path, cb) {
+  const unsub = window._onValue(dbRef(path), cb);
+  state.listeners.push(unsub);
+  return unsub;
+}
+
+function dbRemove(path) {
+  return window._remove(dbRef(path));
+}
+
+function cleanupListeners() {
+  state.listeners.forEach(u => { try { u(); } catch(e){} });
+  state.listeners = [];
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SHARING FLOW
+// ═══════════════════════════════════════════════════════════════
+async function startSharing() {
+  if (!state.firebaseOk) {
+    showToast('⚠️ Configure Firebase first! See SETUP.md');
+    return;
+  }
+  state.mode = 'sharer';
+  state.roomCode = genCode();
+  state.myUserId = genUserId();
+
+  document.getElementById('display-code').textContent = state.roomCode;
+  document.getElementById('share-status-text').textContent = 'Getting GPS…';
+  document.getElementById('map-room-label').textContent = state.roomCode;
+  document.getElementById('map-status-text').textContent = 'Sharing';
+  document.getElementById('me-label').textContent = 'Me (sharing)';
+  showScreen('share-screen');
+
+  // Watch GPS & push to Firebase
+  state.watchId = startGPS(async (lat, lng, acc) => {
+    document.getElementById('share-status-text').textContent = 'Broadcasting';
+    document.getElementById('my-coords').style.display = 'flex';
+    document.getElementById('my-lat').textContent = lat.toFixed(5);
+    document.getElementById('my-lon').textContent = lng.toFixed(5);
+
+    await dbSet(`rooms/${state.roomCode}/users/${state.myUserId}`, {
+      lat, lng, acc,
+      ts: Date.now(),
+      role: 'sharer',
+    });
+
+    if (state.map && state.myPos) {
+      updateMyMarker(lat, lng);
+    }
+  });
+
+  // Listen for others joining
+  dbListen(`rooms/${state.roomCode}/users`, snap => {
+    const users = snap.val();
+    if (!users) return;
+    const others = Object.entries(users).filter(([uid]) => uid !== state.myUserId);
+    if (others.length > 0) {
+      document.getElementById('tracker-status').textContent = `🟢 ${others.length} person tracking you`;
+    } else {
+      document.getElementById('tracker-status').textContent = 'Waiting for someone to join…';
+    }
+  });
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(state.roomCode).then(() => showToast('✅ Code copied!')).catch(() => {
+    showToast(`Your code: ${state.roomCode}`);
+  });
+}
+
+async function stopSharing() {
+  if (state.watchId) { navigator.geolocation.clearWatch(state.watchId); state.watchId = null; }
+  cleanupListeners();
+  if (state.roomCode && state.myUserId) {
+    await dbRemove(`rooms/${state.roomCode}/users/${state.myUserId}`);
+  }
+  state.roomCode = null;
+  state.myUserId = null;
+  state.mode = null;
+  showScreen('home-screen');
+  showToast('📴 Stopped sharing');
+}
+
+async function viewMyMap() {
+  showScreen('map-screen');
+  setTimeout(() => {
+    const pos = state.myPos || { lat: 3.1390, lng: 101.6869 };
+    initMap(pos.lat, pos.lng);
+    if (state.myPos) updateMyMarker(state.myPos.lat, state.myPos.lng);
+
+    // Live-update map when own GPS changes
+    dbListen(`rooms/${state.roomCode}/users/${state.myUserId}`, snap => {
+      const d = snap.val();
+      if (!d) return;
+      updateMyMarker(d.lat, d.lng);
+    });
+
+    // Watch others on map too
+    dbListen(`rooms/${state.roomCode}/users`, snap => {
+      const users = snap.val();
+      if (!users) return;
+      Object.entries(users).forEach(([uid, d]) => {
+        if (uid !== state.myUserId) {
+          updateOtherMarker(d.lat, d.lng);
+        }
+      });
+    });
+  }, 100);
+}
+
+function leaveMap() {
+  if (state.mode === 'sharer') showScreen('share-screen');
+  else if (state.mode === 'tracker') showScreen('home-screen');
+  else showScreen('home-screen');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TRACKING FLOW
+// ═══════════════════════════════════════════════════════════════
+async function joinRoom() {
+  if (!state.firebaseOk) {
+    showToast('⚠️ Configure Firebase first! See SETUP.md');
+    return;
+  }
+  const code = document.getElementById('join-code').value.trim().toUpperCase();
+  if (code.length !== 6) { showToast('⚠️ Enter a 6-character code'); return; }
+
+  // Check room exists
+  const roomRef = dbRef(`rooms/${code}/users`);
+  window._onValue(roomRef, async snap => {
+    if (!snap.exists()) { showToast('❌ Room not found. Check the code.'); return; }
+
+    state.mode = 'tracker';
+    state.roomCode = code;
+    state.myUserId = genUserId();
+
+    document.getElementById('map-room-label').textContent = code;
+    document.getElementById('map-status-text').textContent = 'Tracking';
+    document.getElementById('me-label').textContent = 'Me';
+    document.getElementById('other-label').textContent = 'Tracking';
+    showScreen('map-screen');
+
+    setTimeout(() => {
+      initMap(3.1390, 101.6869);
+
+      // Push my own GPS (optional — both sides can share)
+      state.watchId = startGPS(async (lat, lng, acc) => {
+        await dbSet(`rooms/${state.roomCode}/users/${state.myUserId}`, {
+          lat, lng, acc, ts: Date.now(), role: 'tracker',
+        });
+        updateMyMarker(lat, lng);
+      });
+
+      // Watch ALL users in room
+      dbListen(`rooms/${state.roomCode}/users`, roomSnap => {
+        const users = roomSnap.val();
+        if (!users) {
+          document.getElementById('map-status-text').textContent = 'Offline';
+          document.getElementById('map-dot').className = 'dot warn';
+          return;
+        }
+        Object.entries(users).forEach(([uid, d]) => {
+          if (uid === state.myUserId) {
+            updateMyMarker(d.lat, d.lng);
+          } else {
+            updateOtherMarker(d.lat, d.lng);
+            document.getElementById('map-status-text').textContent = 'Live';
+            document.getElementById('map-dot').className = 'dot green';
+          }
+        });
+      });
+    }, 100);
+  }, { onlyOnce: true });
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  CLEANUP ON UNLOAD
+// ═══════════════════════════════════════════════════════════════
+window.addEventListener('beforeunload', () => {
+  if (state.watchId) navigator.geolocation.clearWatch(state.watchId);
+  if (state.roomCode && state.myUserId) {
+    dbRemove(`rooms/${state.roomCode}/users/${state.myUserId}`);
+  }
+});
+</script>
+</body>
+</html>
