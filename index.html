@@ -451,17 +451,26 @@ textarea.input{resize:vertical;min-height:80px;line-height:1.6;font-size:14px}
 .sos-btn.active-sos{animation:sosGlow 1s infinite alternate}
 .sos-label{font-size:14px;font-weight:700;color:var(--red)}
 .sos-sub{font-size:12px;color:var(--text2);text-align:center;font-family:var(--mono);line-height:1.6}
-.emg-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.emg-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;width:100%}
 .emg-card{
   background:var(--surface2);border:1px solid var(--border);
-  border-radius:var(--r-md);padding:14px;text-align:center;cursor:pointer;
+  border-radius:var(--r-md);padding:12px 8px;text-align:center;cursor:pointer;
   text-decoration:none;color:var(--text);transition:border-color .2s;
-  display:flex;flex-direction:column;gap:4px;
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  min-width:0;overflow:hidden;
 }
 .emg-card:hover{border-color:var(--red)}
-.emg-icon{font-size:24px}
-.emg-num{font-size:20px;font-weight:700;color:var(--red);font-family:var(--mono)}
-.emg-name{font-size:11px;color:var(--text2)}
+.emg-card:active{transform:scale(.97)}
+.emg-icon{font-size:22px;line-height:1}
+.emg-num{
+  font-size:clamp(14px,4vw,20px);font-weight:700;color:var(--red);
+  font-family:var(--mono);white-space:nowrap;
+}
+.emg-name{font-size:clamp(9px,2.5vw,11px);color:var(--text2);line-height:1.3;word-break:break-word}
+/* On very small screens stack to single column */
+@media(max-width:320px){
+  .emg-grid{grid-template-columns:1fr}
+}
 
 /* ═══════════════════════════════════════════════════════════
    SILENT TRACKER SCREEN
@@ -674,6 +683,49 @@ pre.rules-code{
 /* ═══════════════════════════════════════════════════════════
    KEYFRAMES
 ═══════════════════════════════════════════════════════════ */
+/* ── RESPONSIVE BREAKPOINTS ── */
+@media (max-width:360px){
+  .scroll{padding:12px 12px 20px}
+  .action-grid{gap:8px}
+  .action-card{padding:12px 10px}
+  .action-title{font-size:13px}
+  .room-code{font-size:28px;letter-spacing:8px}
+  .btn{padding:12px 14px;font-size:13px}
+  .page-title{font-size:18px}
+  .sos-btn{width:70px;height:70px}
+  .sos-ring-wrap{width:90px;height:90px}
+  .sos-ring{width:90px;height:90px}
+  .trk-stats{grid-template-columns:1fr 1fr}
+  .trk-stat-val{font-size:15px}
+}
+@media (max-width:320px){
+  .btn-row{flex-direction:column}
+  .btn-row .btn{width:100%}
+  .freq-row{flex-wrap:wrap}
+  .freq-btn{min-width:calc(50% - 4px);flex:none}
+  .map-btn-row{gap:5px}
+  .map-btn{padding:7px 9px;font-size:11px}
+}
+@media (min-width:600px){
+  .scroll{max-width:520px}
+  .action-grid{grid-template-columns:1fr 1fr}
+  .emg-grid{grid-template-columns:repeat(4,1fr)}
+  .page-header{max-width:520px}
+}
+@media (min-width:900px){
+  :root{--nav-h:70px}
+  .scroll{max-width:560px}
+  .page-title{font-size:24px}
+  .btn{padding:16px 20px;font-size:15px}
+  .card-label{font-size:12px}
+}
+/* Ensure no horizontal scroll anywhere */
+html,body,.screen,.scroll{max-width:100vw}
+.scroll{box-sizing:border-box}
+/* Fix coordinate tags wrapping badly */
+.coord-bar{flex-wrap:wrap;gap:6px}
+.coord-tag{white-space:nowrap;flex-shrink:0}
+
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 @keyframes sosPulse{0%{transform:scale(.8);opacity:.8}100%{transform:scale(2.2);opacity:0}}
 @keyframes sosGlow{from{box-shadow:0 0 24px rgba(248,113,113,.5)}to{box-shadow:0 0 52px rgba(248,113,113,.9)}}
@@ -954,10 +1006,26 @@ pre.rules-code{
       <div class="card-header"><span class="card-label">Emergency Numbers (MY)</span></div>
       <div class="card-body tight">
         <div class="emg-grid">
-          <a class="emg-card" href="tel:999"><div class="emg-icon">🚓</div><div class="emg-num">999</div><div class="emg-name">Police / Ambulance</div></a>
-          <a class="emg-card" href="tel:994"><div class="emg-icon">🚒</div><div class="emg-num">994</div><div class="emg-name">Fire &amp; Rescue</div></a>
-          <a class="emg-card" href="tel:991"><div class="emg-icon">🏥</div><div class="emg-num">991</div><div class="emg-name">Hospital KKM</div></a>
-          <a class="emg-card" href="tel:15999"><div class="emg-icon">🔥</div><div class="emg-num">15999</div><div class="emg-name">Bomba HQ</div></a>
+          <a class="emg-card" href="tel:999">
+            <div class="emg-icon">🚔</div>
+            <div class="emg-num">999</div>
+            <div class="emg-name">Police &amp; Ambulance</div>
+          </a>
+          <a class="emg-card" href="tel:994">
+            <div class="emg-icon">🚒</div>
+            <div class="emg-num">994</div>
+            <div class="emg-name">Fire &amp; Rescue</div>
+          </a>
+          <a class="emg-card" href="tel:15999">
+            <div class="emg-icon">🔥</div>
+            <div class="emg-num">15999</div>
+            <div class="emg-name">Bomba HQ</div>
+          </a>
+          <a class="emg-card" href="tel:03-26882000">
+            <div class="emg-icon">💙</div>
+            <div class="emg-num">Talian<br>Kasih</div>
+            <div class="emg-name">03-2688 2000</div>
+          </a>
         </div>
       </div>
     </div>
@@ -1103,7 +1171,7 @@ pre.rules-code{
       <div style="font-size:17px;font-weight:700;color:var(--red)">🔒 Fix Database Rules</div>
       <button onclick="closeRulesModal()" class="modal-close">✕ Close</button>
     </div>
-    <div class="alert alert-amber"><span class="alert-icon">⚠️</span><div>Firebase rules are blocking access. 2-minute fix below.</div></div>
+    <div class="alert alert-amber"><span class="alert-icon">⚠️</span><div>These are <b>hardened security rules</b> — they validate all data and prevent tampering. Paste &amp; publish in Firebase Console.</div></div>
     <div class="rules-step">
       <div class="rules-step-title">Step 1 — Open Firebase Console</div>
       <button onclick="window.open('https://console.firebase.google.com/project/ping-me-1c3d9/database/ping-me-1c3d9-default-rtdb/rules','_blank')" style="width:100%;padding:10px;background:linear-gradient(135deg,var(--amber),#b45309);color:#07111f;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer">🔗 Open Database Rules</button>
@@ -1111,10 +1179,48 @@ pre.rules-code{
     <div class="rules-step">
       <div class="rules-step-title">Step 2 — Paste this &amp; click Publish</div>
       <div style="position:relative">
-        <pre class="rules-code">{
+        <pre class="rules-code" id="rules-code-content">{
   "rules": {
-    ".read": true,
-    ".write": true
+    "rooms": {
+      "$roomCode": {
+        "meta": {
+          ".read": true,
+          ".write": true,
+          "freqMs": {
+            ".validate": "newData.isNumber() && newData.val() >= 10000 && newData.val() <= 3600000"
+          }
+        },
+        "users": {
+          ".read": true,
+          "$userId": {
+            ".write": "auth == null",
+            ".validate": "newData.hasChildren(['lat','lng','ts','name'])",
+            "lat":    { ".validate": "newData.isNumber() && newData.val() >= -90 && newData.val() <= 90" },
+            "lng":    { ".validate": "newData.isNumber() && newData.val() >= -180 && newData.val() <= 180" },
+            "acc":    { ".validate": "!newData.exists() || newData.isNumber()" },
+            "ts":     { ".validate": "newData.isNumber() && newData.val() > 0" },
+            "name":   { ".validate": "newData.isString() && newData.val().length <= 30" },
+            "emoji":  { ".validate": "!newData.exists() || newData.isString()" },
+            "role":   { ".validate": "!newData.exists() || newData.val() === 'sharer' || newData.val() === 'tracker'" },
+            "silent": { ".validate": "!newData.exists() || newData.isBoolean()" }
+          }
+        }
+      }
+    },
+    "sos": {
+      ".read": true,
+      "$userId": {
+        ".write": "auth == null",
+        ".validate": "newData.hasChildren(['lat','lng','ts','name'])",
+        "lat":    { ".validate": "newData.isNumber() && newData.val() >= -90 && newData.val() <= 90" },
+        "lng":    { ".validate": "newData.isNumber() && newData.val() >= -180 && newData.val() <= 180" },
+        "acc":    { ".validate": "!newData.exists() || newData.isNumber()" },
+        "ts":     { ".validate": "newData.isNumber() && newData.val() > 0" },
+        "name":   { ".validate": "newData.isString() && newData.val().length <= 30" },
+        "emoji":  { ".validate": "!newData.exists() || newData.isString()" },
+        "active": { ".validate": "newData.isBoolean()" }
+      }
+    }
   }
 }</pre>
         <button onclick="copyRules()" style="position:absolute;top:8px;right:8px;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:4px 10px;font-size:10px;cursor:pointer">📋 Copy</button>
@@ -1590,18 +1696,65 @@ function deactivateSOS(){
   cleanL(); showToast('✅ SOS cancelled. Stay safe!');
 }
 function shareSOSWA(){
-  var p=S.myPos||{lat:0,lng:0};
-  var gm='https://maps.google.com/?q='+p.lat+','+p.lng;
-  var t=new Date().toLocaleTimeString();
-  var msg='🆘 *EMERGENCY SOS*\n\n*'+S.myName+'* needs immediate help!\n\n📍 Live location:\n'+gm+'\n\n📌 '+p.lat.toFixed(6)+', '+p.lng.toFixed(6)+'\n⏰ '+t+'\n\n_Please call 999 or go to this location._';
-  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+  // Always fetch fresh GPS before composing — avoids sending stale or 0,0 coords
+  function sendSOS(p){
+    var gm='https://maps.google.com/?q='+p.lat+','+p.lng;
+    var t=new Date().toLocaleTimeString();
+    var msg='\u{1F198} *EMERGENCY SOS*\n\n*'+S.myName+'* needs immediate help!\n\n\u{1F4CD} Live location:\n'+gm+'\n\n\u{1F4CC} Coords: '+p.lat.toFixed(6)+', '+p.lng.toFixed(6)+'\n\u23F0 '+t+'\n\nPlease call 999 or go to this location.\n_Sent via PingMe_';
+    window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+  }
+  if(!navigator.geolocation){
+    if(S.myPos&&S.myPos.lat){sendSOS(S.myPos);}
+    else{showToast('No GPS available on this device');}
+    return;
+  }
+  showToast('Getting latest GPS…',1500);
+  navigator.geolocation.getCurrentPosition(
+    function(pos){
+      var p={lat:pos.coords.latitude,lng:pos.coords.longitude,acc:pos.coords.accuracy};
+      S.myPos=p;
+      var el=document.getElementById('sos-lat'); if(el) el.textContent=p.lat.toFixed(6);
+      el=document.getElementById('sos-lon'); if(el) el.textContent=p.lng.toFixed(6);
+      sendSOS(p);
+    },
+    function(){
+      if(S.myPos&&(S.myPos.lat||S.myPos.lat===0)&&S.myPos.lat!==0){
+        showToast('Using last known position',2000);
+        sendSOS(S.myPos);
+      } else {
+        showToast('No GPS position — move to open area and retry');
+      }
+    },
+    {enableHighAccuracy:true,timeout:6000,maximumAge:15000}
+  );
 }
+
 function shareSOSMap(){
-  var p=S.myPos; if(!p){showToast('⚠️ GPS not ready yet');return;}
-  var gm='https://maps.google.com/?q='+p.lat+','+p.lng;
-  var msg='🆘 *SOS EMERGENCY*\n\n*'+S.myName+'* needs help!\n\n📍 '+gm+'\n📌 '+p.lat.toFixed(6)+', '+p.lng.toFixed(6)+'\n⏰ '+new Date().toLocaleTimeString();
-  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+  function sendMap(p){
+    var gm='https://maps.google.com/?q='+p.lat+','+p.lng;
+    var msg='\u{1F198} *SOS EMERGENCY*\n\n*'+S.myName+'* needs help!\n\n\u{1F4CD} Location:\n'+gm+'\n\n\u{1F4CC} Coords: '+p.lat.toFixed(6)+', '+p.lng.toFixed(6)+'\n\u23F0 '+new Date().toLocaleTimeString()+'\n\nPlease call 999 immediately.\n_Sent via PingMe_';
+    window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+  }
+  if(!navigator.geolocation){
+    if(S.myPos&&S.myPos.lat){sendMap(S.myPos);}
+    else{showToast('No GPS available');}
+    return;
+  }
+  showToast('Getting latest GPS…',1500);
+  navigator.geolocation.getCurrentPosition(
+    function(pos){
+      var p={lat:pos.coords.latitude,lng:pos.coords.longitude};
+      S.myPos=Object.assign(S.myPos||{},p);
+      sendMap(p);
+    },
+    function(){
+      if(S.myPos&&S.myPos.lat){sendMap(S.myPos);}
+      else{showToast('No GPS position available');}
+    },
+    {enableHighAccuracy:true,timeout:6000,maximumAge:15000}
+  );
 }
+
 function callEmergency(){
   var coords=S.myPos?('Coords: '+S.myPos.lat.toFixed(5)+', '+S.myPos.lng.toFixed(5)):'';
   if(confirm('Call 999?\n\n'+coords)) window.location.href='tel:999';
@@ -1806,8 +1959,10 @@ function showFirebaseRulesHelp(){
 }
 function closeRulesModal(){ document.getElementById('rules-modal').classList.remove('open'); }
 function copyRules(){
-  var rules='{\n  "rules": {\n    ".read": true,\n    ".write": true\n  }\n}';
-  navigator.clipboard.writeText(rules).then(function(){showToast('✅ Rules copied!');}).catch(function(){showToast('Copy failed');});
+  var el=document.getElementById('rules-code-content');
+  var rules=el?el.textContent:'';
+  if(!rules){showToast('Could not find rules text');return;}
+  navigator.clipboard.writeText(rules.trim()).then(function(){showToast('Hardened rules copied!');}).catch(function(){showToast('Copy failed');});
 }
 
 // ═══════════════════════════════════════════
