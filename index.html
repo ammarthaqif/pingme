@@ -185,6 +185,21 @@ input.ni::placeholder{letter-spacing:.5px;}
   </div>
   <button class="btn bc" onclick="startSharing()" style="animation-delay:.08s">📍 Share My Location</button>
   <div class="divider" style="animation-delay:.11s">join a session</div>
+
+  <!-- Auto-join banner — shown when ?room= link is opened -->
+  <div id="autojoin-banner" style="display:none;width:100%;animation:fadeUp .3s ease both;">
+    <div style="background:linear-gradient(135deg,rgba(139,92,246,.12),rgba(0,229,255,.08));border:1.5px solid var(--pu);border-radius:15px;padding:18px 16px;display:flex;flex-direction:column;gap:12px;align-items:center;text-align:center;">
+      <div style="font-size:26px;">🔗</div>
+      <div style="font-size:15px;font-weight:700;">You were invited to a room</div>
+      <div style="font-family:var(--mo);font-size:11px;color:var(--mt);">Room code detected from link</div>
+      <div style="font-family:var(--mo);font-size:30px;font-weight:500;letter-spacing:10px;background:linear-gradient(90deg,var(--cy),var(--pu));-webkit-background-clip:text;-webkit-text-fill-color:transparent;" id="banner-code">——</div>
+      <button class="btn bp" id="autojoin-btn" onclick="joinRoom()" style="width:100%;font-size:16px;padding:16px;">
+        <span id="autojoin-btn-text">🚀 Join Room Now</span>
+      </button>
+      <div style="font-size:11px;font-family:var(--mo);color:var(--mt);">or enter a different code below</div>
+    </div>
+  </div>
+
   <div class="card" style="animation-delay:.13s">
     <div class="ch"><div class="cl">Enter Room Code</div></div>
     <div class="cb" style="display:flex;flex-direction:column;gap:8px;">
@@ -394,9 +409,9 @@ async function stopSharing(){
   showScreen('home-screen');showToast('📴 Stopped sharing');
 }
 async function joinRoom(){
-  if(!S.firebaseOk){showToast('⚠️ Configure Firebase first!');return;}
+  if(!S.firebaseOk){showToast('⚠️ Configure Firebase first!');return Promise.reject('no firebase');}
   const code=document.getElementById('join-code').value.trim().toUpperCase();
-  if(code.length!==6){showToast('⚠️ Enter the 6-char code');return;}
+  if(code.length!==6){showToast('⚠️ Enter the 6-char code');return Promise.reject('bad code');}
   showToast('🔍 Looking up room…');
   // Proper async snapshot — avoids onlyOnce callback timing issues
   let snap;
@@ -474,16 +489,37 @@ function watchSOSChannel(){
 }
 (function(){
   const room=new URLSearchParams(location.search).get('room');
-  if(room){
-    const code=room.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6);
-    document.getElementById('join-code').value=code;
-    showToast(`🔑 Room ${code} detected — joining…`,3000);
-    // Auto-join once Firebase is ready
-    if(S.firebaseOk){
-      joinRoom();
-    } else {
-      document.addEventListener('firebase-ready',()=>{ setTimeout(joinRoom,400); },{once:true});
-    }
+  if(!room) return;
+  const code=room.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6);
+  if(code.length!==6) return;
+
+  // Fill both the input and the banner
+  document.getElementById('join-code').value=code;
+  const banner=document.getElementById('autojoin-banner');
+  const bannerCode=document.getElementById('banner-code');
+  if(banner){ banner.style.display='block'; }
+  if(bannerCode){ bannerCode.textContent=code; }
+
+  // Set loading state on join button
+  function setJoinLoading(on){
+    const btn=document.getElementById('autojoin-btn');
+    const txt=document.getElementById('autojoin-btn-text');
+    if(!btn||!txt) return;
+    btn.disabled=on;
+    txt.textContent=on?'⏳ Connecting…':'🚀 Join Room Now';
+    btn.style.opacity=on?'.7':'1';
+  }
+
+  // Auto-join with Firebase-ready guard
+  function doAutoJoin(){
+    setJoinLoading(true);
+    joinRoom().catch(()=>setJoinLoading(false));
+  }
+
+  if(S.firebaseOk){
+    setTimeout(doAutoJoin, 300);
+  } else {
+    document.addEventListener('firebase-ready',()=>{ setTimeout(doAutoJoin,400); },{once:true});
   }
 })();
 window.addEventListener('beforeunload',()=>{gpsStop(S.watchId);gpsStop(S.sosWatchId);if(S.roomCode)dbDel(`rooms/${S.roomCode}/users/${S.myId}`);if(S.sosActive)dbDel(`sos/${S.myId}`);});
